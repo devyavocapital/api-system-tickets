@@ -3,8 +3,6 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 exports.authUser = async (req, res) => {
-	const sequelize = fnSequelize();
-
 	const { email, password } = req.body;
 
 	if (email === "" || email === undefined) {
@@ -16,6 +14,7 @@ exports.authUser = async (req, res) => {
 	}
 
 	try {
+		const sequelize = fnSequelize();
 		const response = await sequelize.query(`EXEC SP_LOGIN '${email}'`);
 		sequelize.close();
 
@@ -28,9 +27,8 @@ exports.authUser = async (req, res) => {
 
 		//firmar jwt
 		const payload = {
-			userPayload: {
+			usuario: {
 				id: user[0].id,
-				email: user[0].email,
 			},
 		};
 
@@ -53,14 +51,14 @@ exports.authUser = async (req, res) => {
 	}
 };
 
-exports.userAuthenticate = async (res, req) => {
-	const { email } = req.body;
-
+exports.userAuthenticate = async (req, res) => {
 	try {
-		const usuario = "select * from user where email = email";
+		const sequelize = fnSequelize();
+		const usuario = await sequelize.query(`EXEC SP_LOGIN ${req.usuario.id}`);
+		sequelize.close();
 		res.json({ usuario });
 	} catch (error) {
 		console.log(error);
-		res.json({ error: "Hubo un error" });
+		return res.json({ error: "Hubo un error" });
 	}
 };

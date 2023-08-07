@@ -13,6 +13,6 @@ module.exports = function (req, res, next) {
 		req.usuario = cifrado.usuario;
 		next();
 	} catch (error) {
-		res.json({ mdg: "El token no es válido" });
+		res.json({ msg: "El token no es válido" });
 	}
 };
