@@ -2,7 +2,7 @@ const { fnSequelize } = require("../db/config");
 
 exports.createComment = async (req, res) => {
 	let id;
-	const { description, id_issue } = req.body;
+	const { description, id_issue, userAssignated, status } = req.body;
 
 	if (req.body.id === undefined) id = "null";
 	if (req.body.id !== undefined) id = req.body.id;
@@ -10,7 +10,7 @@ exports.createComment = async (req, res) => {
 	try {
 		const sequelize = fnSequelize();
 		const issue = await sequelize.query(
-			`EXEC SP_COMMENTS ${id}, '${description}', ${req.usuario.id}, ${id_issue}`,
+			`EXEC SP_COMMENTS ${id}, '${description}', ${req.usuario.id}, ${id_issue}, ${userAssignated}, '${status}'`,
 		);
 		sequelize.close();
 		res.json({ issue });

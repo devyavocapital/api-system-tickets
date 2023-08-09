@@ -10,6 +10,7 @@ exports.createIssue = async (req, res) => {
 		initialComment,
 		assignTo,
 		status,
+		category,
 	} = req.body;
 
 	if (req.body.id === undefined) id = "null";
@@ -18,9 +19,11 @@ exports.createIssue = async (req, res) => {
 	try {
 		const sequelize = fnSequelize();
 		const issue = await sequelize.query(
-			`EXEC SP_ISSUES ${id}, '${nameClient}', '${creditNumber}', '${socialNumber}', '${cardNumber}', '${initialComment}', ${assignTo}, ${
-				req.usuario.id
-			}, ${status === "" ? "'pendient'" : `'${status}'`}`,
+			`EXEC SP_ISSUES ${id}, '${nameClient}', '${creditNumber}', '${socialNumber}', '${cardNumber}', ${
+				initialComment === undefined ? "''" : `'${initialComment}'`
+			}, ${assignTo === undefined ? 0 : assignTo}, ${req.usuario.id}, ${
+				status === undefined ? "'pendient'" : `'${status}'`
+			}, ${category === undefined ? 0 : category}`,
 		);
 		sequelize.close();
 		res.json({ issue });

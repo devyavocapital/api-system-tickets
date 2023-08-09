@@ -13,6 +13,7 @@ app.use("/api/v1/create", require("./routes/createUser"));
 app.use("/api/v1/issues", require("./routes/issues"));
 app.use("/api/v1/comments", require("./routes/comments"));
 app.use("/api/v1/names", require("./routes/names"));
+app.use("/api/v1/categories", require("./routes/categories"));
 
 app.listen(PORT, () => {
 	console.log("El servidor esta usando el puerto: ", PORT);
