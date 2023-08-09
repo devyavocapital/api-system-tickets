@@ -2,7 +2,8 @@ const bcrypt = require("bcrypt");
 const { fnSequelize } = require("../db/config");
 
 exports.createUser = async (req, res) => {
-	const { email, password, category } = req.body;
+	const { email, password, category, nombre, ap_paterno, ap_materno } =
+		req.body;
 
 	if (email === "" || email === undefined) {
 		return res.json({ error: "El campo email es obligatorio" });
@@ -19,17 +20,14 @@ exports.createUser = async (req, res) => {
 		const newPass = await bcrypt.hash(password, salt);
 
 		await sequelize.query(
-			`DECLARE @ID_USER INT;
-            EXEC SP_NEW_USER '${email}', '${newPass}', ${category},
-            @ID_USER OUTPUT;
-            select @ID_USER as RegistroAfectado;`,
+			`EXEC SP_NEW_USER '${email}', '${newPass}', ${category}, ${nombre}, ${ap_paterno}, ${ap_materno}`,
 		);
 		sequelize.close();
 
 		res.json({ msg: "Usuario creado correctamente" });
 	} catch (error) {
 		console.log(error);
-		const errorLog = `"Unable to connect to the database:", ${error.original}`;
+		const errorLog = `${error.original}`;
 		res.json({ error: errorLog });
 	}
 

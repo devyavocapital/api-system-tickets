@@ -17,6 +17,9 @@ exports.fnSequelize = () => {
 			host: dbConfig.hostDatabase,
 			dialect: dbConfig.typeDatabase,
 			/* one of 'mysql' | 'postgres' | 'sqlite' | 'mariadb' | 'mssql' | 'db2' | 'snowflake' | 'oracle' */
+			dialectOptions: {
+				multipleStatements: true,
+			},
 		},
 	);
 

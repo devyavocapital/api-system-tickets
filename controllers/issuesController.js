@@ -39,10 +39,13 @@ exports.getIssues = async (req, res) => {
 	try {
 		const sequelize = fnSequelize();
 		const issue = await sequelize.query(`EXEC SP_LST_ISSUES ${id}`, {
+			type: sequelize.QueryTypes.SELECT,
+		});
+		const comments = await sequelize.query(`EXEC SP_LST_COMMENTS ${id}`, {
 			type: sequelize.QueryTypes.RAW,
 		});
 		sequelize.close();
-		res.json({ issue });
+		res.json({ issue, comments });
 	} catch (error) {
 		console.log(error);
 		return res.json({ error: "Hubo un error" });
