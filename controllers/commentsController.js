@@ -10,7 +10,11 @@ exports.createComment = async (req, res) => {
 	try {
 		const sequelize = fnSequelize();
 		const issue = await sequelize.query(
-			`EXEC SP_COMMENTS ${id}, '${description}', ${req.usuario.id}, ${id_issue}, ${userAssignated}, '${status}'`,
+			`EXEC SP_COMMENTS ${id}, '${description}', ${
+				req.usuario.id
+			}, ${id_issue}, ${
+				userAssignated === undefined ? 0 : userAssignated
+			}, '${status}'`,
 		);
 		sequelize.close();
 		res.json({ issue });
