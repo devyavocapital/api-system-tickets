@@ -1,5 +1,21 @@
 const { fnSequelize } = require("../db/config");
 
+exports.getComments = async (req, res) => {
+	const { id } = req.query;
+
+	try {
+		const sequelize = fnSequelize();
+		const comments = await sequelize.query(
+			`EXEC SP_LST_COMMENTS ${id === undefined ? "null" : id}`,
+		);
+		sequelize.close();
+		res.json(comments);
+	} catch (error) {
+		console.log(error);
+		return res.json({ error: "Hubo un error" });
+	}
+};
+
 exports.createComment = async (req, res) => {
 	let id;
 	const { description, id_issue, userAssignated, status } = req.body;
