@@ -9,10 +9,28 @@ exports.createNotification = async (req, res) => {
 	try {
 		const sequelize = fnSequelize();
 		await sequelize.query(
-			`EXEC SP_NOTIFICATIONS ${id}, '${nameClient}', ${req.usuario.id}, ${userAssignated}, 0, 1`,
+			`EXEC SP_NOTIFICATIONS ${id}, '${nameClient}', ${req.usuario.id}, ${userAssignated}, 0, 1, NULL`,
 		);
 		sequelize.close();
 		res.json({ msg: "Notificación agregada." });
+	} catch (error) {
+		console.log(error);
+		return res.json({ error: "Hubo un error" });
+	}
+};
+
+exports.updateDataNotification = async (req, res) => {
+	const { originalClient, userAssignated, newNameClient } = req.body;
+	const id = "null";
+
+	// [dbo].[SP_NOTIFICATIONS] (@ID_NOTIFICATION INT, @CLIENT VARCHAR(MAX), @USER_CREATED INT, @USER_ASSIGNATED INT, @READED BIT, @ACTIVE BIT)
+	try {
+		const sequelize = fnSequelize();
+		await sequelize.query(
+			`EXEC SP_NOTIFICATIONS ${id}, '${originalClient}', ${req.usuario.id}, ${userAssignated}, 0, 1, '${newNameClient}'`,
+		);
+		sequelize.close();
+		res.json({ msg: "Notificación Actualizada." });
 	} catch (error) {
 		console.log(error);
 		return res.json({ error: "Hubo un error" });
@@ -34,14 +52,12 @@ exports.getNotifications = async (req, res) => {
 };
 
 exports.updateNotification = async (req, res) => {
-	console.log("actu");
 	const { id, readed, active } = req.body;
-	console.log(req.body);
 	// [dbo].[SP_NOTIFICATIONS] (@ID_NOTIFICATION INT, @CLIENT VARCHAR(MAX), @USER_CREATED INT, @USER_ASSIGNATED INT, @READED BIT, @ACTIVE BIT)
 	try {
 		const sequelize = fnSequelize();
 		await sequelize.query(
-			`EXEC SP_NOTIFICATIONS ${id}, '', '', '', ${readed}, ${active}`,
+			`EXEC SP_NOTIFICATIONS ${id}, '', '', '', ${readed}, ${active}, NULL`,
 		);
 		sequelize.close();
 		res.json({ msg: "Notificación actualizada." });

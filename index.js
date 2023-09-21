@@ -44,6 +44,7 @@ app.use("/api/v1/comments", require("./routes/comments"));
 app.use("/api/v1/names", require("./routes/names"));
 app.use("/api/v1/categories", require("./routes/categories"));
 app.use("/api/v1/notifications", require("./routes/notifications"));
+app.use("/images", require("./routes/images"));
 
 http.listen(PORT, () => {
 	console.log("El servidor esta usando el puerto: ", PORT);

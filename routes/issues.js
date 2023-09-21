@@ -5,5 +5,6 @@ const auth = require("../middleware/auth");
 
 router.get("/", auth, issuesController.getIssues);
 router.post("/", auth, issuesController.createIssue);
+router.put("/", auth, issuesController.updateIssue);
 
 module.exports = router;
