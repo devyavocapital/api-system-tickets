@@ -1,11 +1,14 @@
-const express = require("express");
-const router = express.Router();
-const notificationsController = require("../controllers/notificationsController");
-const auth = require("../middleware/auth");
+import { Router } from "express";
+import {
+	createNotification,
+	getNotifications,
+	updateDataNotification,
+	updateNotification,
+} from "../controllers/notificationsController.js";
+import { auth } from "../middleware/auth.js";
+export const notificationRouter = Router();
 
-router.get("/", auth, notificationsController.getNotifications);
-router.put("/data", auth, notificationsController.updateDataNotification);
-router.post("/", auth, notificationsController.createNotification);
-router.put("/", auth, notificationsController.updateNotification);
-
-module.exports = router;
+notificationRouter.get("/", auth, getNotifications);
+notificationRouter.put("/data", auth, updateDataNotification);
+notificationRouter.post("/", auth, createNotification);
+notificationRouter.put("/", auth, updateNotification);

@@ -1,68 +1,51 @@
-const { fnSequelize } = require("../db/config");
+import { NotificationnModel } from "../models/notification.js";
 
-exports.createNotification = async (req, res) => {
+export const createNotification = async (req, res) => {
 	const { nameClient, userAssignated } = req.body;
 
 	const id = "null";
 
-	// [dbo].[SP_NOTIFICATIONS] (@ID_NOTIFICATION INT, @CLIENT VARCHAR(MAX), @USER_CREATED INT, @USER_ASSIGNATED INT, @READED BIT, @ACTIVE BIT)
-	try {
-		const sequelize = fnSequelize();
-		await sequelize.query(
-			`EXEC SP_NOTIFICATIONS ${id}, '${nameClient}', ${req.usuario.id}, ${userAssignated}, 0, 1, NULL`,
-		);
-		sequelize.close();
-		res.json({ msg: "Notificación agregada." });
-	} catch (error) {
-		console.log(error);
-		return res.json({ error: "Hubo un error" });
-	}
+	const response = await NotificationnModel.createNotification({
+		id,
+		nameClient,
+		userId: req.usuario.id,
+		userAssignated,
+	});
+
+	return res.json(response);
 };
 
-exports.updateDataNotification = async (req, res) => {
+export const updateDataNotification = async (req, res) => {
 	const { originalClient, userAssignated, newNameClient } = req.body;
 	const id = "null";
 
-	// [dbo].[SP_NOTIFICATIONS] (@ID_NOTIFICATION INT, @CLIENT VARCHAR(MAX), @USER_CREATED INT, @USER_ASSIGNATED INT, @READED BIT, @ACTIVE BIT)
-	try {
-		const sequelize = fnSequelize();
-		await sequelize.query(
-			`EXEC SP_NOTIFICATIONS ${id}, '${originalClient}', ${req.usuario.id}, ${userAssignated}, 0, 1, '${newNameClient}'`,
-		);
-		sequelize.close();
-		res.json({ msg: "Notificación Actualizada." });
-	} catch (error) {
-		console.log(error);
-		return res.json({ error: "Hubo un error" });
-	}
+	const response = await NotificationnModel.updateDataNotification({
+		id,
+		originalClient,
+		userAssignated,
+		newNameClient,
+		userId: req.usuario.id,
+	});
+
+	return res.json(response);
 };
 
-exports.getNotifications = async (req, res) => {
-	try {
-		const sequelize = fnSequelize();
-		const notifications = await sequelize.query(
-			`EXEC SP_LST_NOTIFICATIONS ${req.usuario.id}`,
-		);
-		sequelize.close();
-		res.json({ notifications });
-	} catch (error) {
-		console.log(error);
-		return res.json({ error: "Hubo un error" });
-	}
+export const getNotifications = async (req, res) => {
+	const response = await NotificationnModel.getNotifications({
+		userId: req.usuario.id,
+	});
+
+	return res.json(response);
 };
 
-exports.updateNotification = async (req, res) => {
+export const updateNotification = async (req, res) => {
 	const { id, readed, active } = req.body;
-	// [dbo].[SP_NOTIFICATIONS] (@ID_NOTIFICATION INT, @CLIENT VARCHAR(MAX), @USER_CREATED INT, @USER_ASSIGNATED INT, @READED BIT, @ACTIVE BIT)
-	try {
-		const sequelize = fnSequelize();
-		await sequelize.query(
-			`EXEC SP_NOTIFICATIONS ${id}, '', '', '', ${readed}, ${active}, NULL`,
-		);
-		sequelize.close();
-		res.json({ msg: "Notificación actualizada." });
-	} catch (error) {
-		console.log(error);
-		return res.json({ error: "Hubo un error" });
-	}
+
+	const response = await NotificationnModel.updateNotification({
+		id,
+		readed,
+		active,
+	});
+
+	return res.json(response);
 };

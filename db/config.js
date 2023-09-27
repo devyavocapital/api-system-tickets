@@ -1,6 +1,7 @@
-const { Sequelize } = require("sequelize");
+// const { Sequelize } = require("sequelize");
+import { Sequelize } from "sequelize";
 
-dbConfig = {
+const dbConfig = {
 	dataBaseName: process.env.NAME_DATABASE,
 	userDatabase: process.env.USER_DATABASE,
 	passDatabase: process.env.PASS_DATABASE,
@@ -8,7 +9,7 @@ dbConfig = {
 	typeDatabase: process.env.TYPE_DATABASE,
 };
 
-exports.fnSequelize = () => {
+export const fnSequelize = () => {
 	const sequelize = new Sequelize(
 		dbConfig.dataBaseName,
 		dbConfig.userDatabase,

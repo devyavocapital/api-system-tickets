@@ -1,41 +1,25 @@
-const { fnSequelize } = require("../db/config");
+import { CommentModel } from "../models/comment.js";
 
-exports.getComments = async (req, res) => {
+export const getComments = async (req, res) => {
 	const { id } = req.query;
 
-	try {
-		const sequelize = fnSequelize();
-		const comments = await sequelize.query(
-			`EXEC SP_LST_COMMENTS ${id === undefined ? "null" : id}`,
-		);
-		sequelize.close();
-		res.json(comments);
-	} catch (error) {
-		console.log(error);
-		return res.json({ error: "Hubo un error" });
-	}
+	const response = await CommentModel.getComments({ id });
+	return res.json(response);
 };
 
-exports.createComment = async (req, res) => {
-	let id;
-	const { description, id_issue, userAssignated, status, fileName } = req.body;
+export const createComment = async (req, res) => {
+	const { id, description, id_issue, userAssignated, status, fileName } =
+		req.body;
 
-	if (req.body.id === undefined) id = "null";
-	if (req.body.id !== undefined) id = req.body.id;
+	const response = await CommentModel.createComment({
+		id,
+		description,
+		id_issue,
+		userAssignated,
+		status,
+		fileName,
+		userId: req.usuario.id,
+	});
 
-	try {
-		const sequelize = fnSequelize();
-		const issue = await sequelize.query(
-			`EXEC SP_COMMENTS ${id}, '${description}', ${
-				req.usuario.id
-			}, ${id_issue}, ${
-				userAssignated === undefined ? 0 : userAssignated
-			}, '${status}', '${fileName}'`,
-		);
-		sequelize.close();
-		res.json({ msg: "Comentario creado correctamente" });
-	} catch (error) {
-		console.log(error);
-		return res.json({ error: "Hubo un error" });
-	}
+	return res.json(response);
 };

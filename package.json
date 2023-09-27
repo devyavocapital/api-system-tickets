@@ -8,6 +8,7 @@
 		"start": "node .",
 		"dev": "nodemon ."
 	},
+	"type": "module",
 	"author": "Sergio Guadarrama",
 	"license": "ISC",
 	"dependencies": {

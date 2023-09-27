@@ -1,12 +1,24 @@
-const express = require("express");
+import cors from "cors";
+import "dotenv/config";
+import express from "express";
+import { createServer } from "http";
+import { Server } from "socket.io";
+
+import { categoryRouter } from "./routes/categories.js";
+import { commentRouter } from "./routes/comments.js";
+import { createUserRouter } from "./routes/createUser.js";
+import { routerImages } from "./routes/images.js";
+import { issuesRouter } from "./routes/issues.js";
+import { loginRouter } from "./routes/login.js";
+import { namesRouter } from "./routes/names.js";
+import { notificationRouter } from "./routes/notifications.js";
+
 const app = express();
-const http = require("http").Server(app);
-const cors = require("cors");
-require("dotenv").config();
+const http = createServer(app);
 
 const PORT = process.env.PORT || 4000;
 
-const socketIO = require("socket.io")(http, {
+const socketIO = new Server(http, {
 	cors: {
 		origin: "http://localhost:5173",
 	},
@@ -37,14 +49,14 @@ socketIO.on("connection", (socket) => {
 	});
 });
 
-app.use("/api/v1/login", require("./routes/login"));
-app.use("/api/v1/create", require("./routes/createUser"));
-app.use("/api/v1/issues", require("./routes/issues"));
-app.use("/api/v1/comments", require("./routes/comments"));
-app.use("/api/v1/names", require("./routes/names"));
-app.use("/api/v1/categories", require("./routes/categories"));
-app.use("/api/v1/notifications", require("./routes/notifications"));
-app.use("/images", require("./routes/images"));
+app.use("/api/v1/login", loginRouter);
+app.use("/api/v1/create", createUserRouter);
+app.use("/api/v1/issues", issuesRouter);
+app.use("/api/v1/comments", commentRouter);
+app.use("/api/v1/names", namesRouter);
+app.use("/api/v1/categories", categoryRouter);
+app.use("/api/v1/notifications", notificationRouter);
+app.use("/images", routerImages);
 
 http.listen(PORT, () => {
 	console.log("El servidor esta usando el puerto: ", PORT);

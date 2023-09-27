@@ -1,9 +1,10 @@
-const express = require("express");
-const router = express.Router();
-const commentsController = require("../controllers/commentsController");
-const auth = require("../middleware/auth");
+import { Router } from "express";
+import {
+	createComment,
+	getComments,
+} from "../controllers/commentsController.js";
+import { auth } from "../middleware/auth.js";
+export const commentRouter = Router();
 
-router.get("/", auth, commentsController.getComments);
-router.post("/", auth, commentsController.createComment);
-
-module.exports = router;
+commentRouter.get("/", auth, getComments);
+commentRouter.post("/", auth, createComment);
