@@ -12,6 +12,7 @@ import { issuesRouter } from "./routes/issues.js";
 import { loginRouter } from "./routes/login.js";
 import { namesRouter } from "./routes/names.js";
 import { notificationRouter } from "./routes/notifications.js";
+import { statsRouter } from "./routes/stats.js";
 
 const app = express();
 const http = createServer(app);
@@ -57,6 +58,7 @@ app.use("/api/v1/names", namesRouter);
 app.use("/api/v1/categories", categoryRouter);
 app.use("/api/v1/notifications", notificationRouter);
 app.use("/images", routerImages);
+app.use("/api/v1/stats", statsRouter);
 
 http.listen(PORT, () => {
 	console.log("El servidor esta usando el puerto: ", PORT);
