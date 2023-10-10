@@ -1,17 +1,28 @@
 import { fnSequelize } from "../db/config.js";
+import { notificationSchema } from "../schemas/notification.js";
 
 export class NotificationnModel {
 	static async createNotification({ id, nameClient, userId, userAssignated }) {
 		// [dbo].[SP_NOTIFICATIONS] (@ID_NOTIFICATION INT, @CLIENT VARCHAR(MAX), @USER_CREATED INT, @USER_ASSIGNATED INT, @READED BIT, @ACTIVE BIT)
 		try {
+			await notificationSchema.parseAsync({
+				id,
+				nameClient,
+				userId,
+				userAssignated,
+			});
 			const sequelize = fnSequelize();
 			await sequelize.query(
-				`EXEC SP_NOTIFICATIONS ${id}, '${nameClient}', ${userId}, ${userAssignated}, 0, 1, NULL`,
+				`EXEC SP_NOTIFICATIONS ${id}, '${nameClient}', ${parseInt(
+					userId,
+				)}, ${userAssignated}, 0, 1, NULL`,
 			);
 			sequelize.close();
 			return { msg: "Notificación agregada." };
 		} catch (error) {
-			console.log(error);
+			if (error.errors) {
+				return { zodError: error?.errors };
+			}
 			return { error: "Hubo un error" };
 		}
 	}
@@ -32,7 +43,6 @@ export class NotificationnModel {
 			sequelize.close();
 			return { msg: "Notificación Actualizada." };
 		} catch (error) {
-			console.log(error);
 			return { error: "Hubo un error" };
 		}
 	}

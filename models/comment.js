@@ -1,4 +1,5 @@
 import { fnSequelize } from "../db/config.js";
+import { commentSchema } from "../schemas/comment.js";
 
 export class CommentModel {
 	static async getComments({ id = null }) {
@@ -23,6 +24,16 @@ export class CommentModel {
 		userId,
 	}) {
 		try {
+			await commentSchema.parseAsync({
+				id,
+				description,
+				id_issue,
+				userAssignated,
+				status,
+				fileName,
+				userId: parseInt(userId),
+			});
+
 			const sequelize = fnSequelize();
 			await sequelize.query(
 				`EXEC SP_COMMENTS ${id}, '${description}', ${userId}, ${id_issue}, ${userAssignated}, '${status}', '${fileName}'`,
@@ -30,7 +41,9 @@ export class CommentModel {
 			sequelize.close();
 			return { msg: "Comentario creado correctamente" };
 		} catch (error) {
-			console.log(error);
+			if (error.errors) {
+				return { zodError: error?.errors };
+			}
 			return { error: "Hubo un error" };
 		}
 	}
