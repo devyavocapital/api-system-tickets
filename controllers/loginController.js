@@ -1,10 +1,15 @@
 import jwt from "jsonwebtoken";
-import { login } from "../models/login.js";
+import { Login } from "../models/login.js";
 
 export const authUser = async (req, res) => {
 	const { email, password } = req.body;
 
-	const payload = await login.getLogin({ email, password });
+	// const payload =
+	const payload = await Login.getLogin({ email, password });
+
+	if (payload?.error) {
+		return res.json(payload);
+	}
 
 	jwt.sign(
 		payload,
@@ -20,6 +25,6 @@ export const authUser = async (req, res) => {
 };
 
 export const userAuthenticate = async (req, res) => {
-	const response = await login.getUserAuthenticated({ id: req.usuario.id });
+	const response = await Login.getUserAuthenticated({ id: req.usuario.id });
 	return res.json(response);
 };

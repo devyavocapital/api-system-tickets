@@ -26,11 +26,12 @@ export class IssuesModel {
 		creditNumber,
 		socialNumber,
 		cardNumber,
-		initialComment = "''",
+		initialComment = "",
 		assignTo = 0,
 		status = "pendient",
 		category = 0,
 		daysConfig,
+		userId,
 	}) {
 		try {
 			await issueSchema.parseAsync({
@@ -44,26 +45,29 @@ export class IssuesModel {
 				initialComment,
 				assignTo,
 				status,
-				category,
-				daysConfig,
+				category: parseInt(category),
+				daysConfig: parseInt(daysConfig),
 			});
+
 			const sequelize = fnSequelize();
 			await sequelize.query(
 				`EXEC SP_ISSUES 
-					${id}, '${nameClient}', 
-					'${lastnameClient}', 
-					'${motherLastnameClient}', 
-					'${creditNumber}', '${socialNumber}', '${cardNumber}', 
-					'${initialComment}', 
-					${assignTo}, ${req.usuario.id}, 
-					'${status}', 
-					${category},
-					${daysConfig}
-					`,
+				${id}, '${nameClient}', 
+				'${lastnameClient}', 
+				'${motherLastnameClient}', 
+				'${creditNumber}', '${socialNumber}', '${cardNumber}', 
+				'${initialComment}', 
+				${assignTo}, ${userId}, 
+				'${status}', 
+				${parseInt(category)},
+				${parseInt(daysConfig)}
+				`,
 			);
 			sequelize.close();
+
 			return { msg: "Incidencia creada correctamente" };
 		} catch (error) {
+			console.log(error);
 			if (error.errors) {
 				return { zodError: error?.errors };
 			}

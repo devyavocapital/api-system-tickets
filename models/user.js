@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import { fnSequelize } from "../db/config.js";
 import { userSchema } from "../schemas/user.js";
+import { capitlizeFn } from "../utils/capitalizeFn.js";
 
 export class UserModel {
 	static async createUser({
@@ -28,7 +29,9 @@ export class UserModel {
 			await sequelize.query(
 				`EXEC SP_NEW_USER '${email}', '${newPass}', ${parseInt(
 					category,
-				)}, '${name}', '${lastname}', '${motherLastname}'`,
+				)}, '${capitlizeFn({ text: name })}', '${capitlizeFn({
+					text: lastname,
+				})}', '${capitlizeFn({ text: motherLastname })}'`,
 			);
 			sequelize.close();
 

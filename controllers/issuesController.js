@@ -29,6 +29,7 @@ export const createIssue = async (req, res) => {
 		status,
 		category,
 		daysConfig,
+		userId: req.usuario.id,
 	});
 	return res.json(response);
 };
