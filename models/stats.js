@@ -7,10 +7,20 @@ export class StatsModel {
 			const stats = await sequelize.query("EXEC SP_LST_STATS 1, NULL");
 			const statsByUser = await sequelize.query("EXEC SP_LST_STATS 2, NULL");
 			const statsCreated = await sequelize.query(
-				`EXEC SP_LST_STATS 3, ${userId}`,
+				"EXEC SP_LST_STATS 3, :userId",
+				{
+					replacements: {
+						userId,
+					},
+				},
 			);
 			const statsAssignated = await sequelize.query(
-				`EXEC SP_LST_STATS 4, ${userId}`,
+				"EXEC SP_LST_STATS 4, :userId",
+				{
+					replacements: {
+						userId,
+					},
+				},
 			);
 			sequelize.close();
 			return { stats, statsByUser, statsCreated, statsAssignated };

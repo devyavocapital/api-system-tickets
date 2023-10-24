@@ -6,7 +6,10 @@ export class CategoryModel {
 		try {
 			const sequelize = fnSequelize();
 			const categories = await sequelize.query(
-				`EXEC SP_LST_CATEGORY_ISSUES ${id}`,
+				"EXEC SP_LST_CATEGORY_ISSUES :id",
+				{
+					replacements: { id },
+				},
 			);
 			sequelize.close();
 			return categories;
@@ -26,7 +29,14 @@ export class CategoryModel {
 
 			const sequelize = fnSequelize();
 			await sequelize.query(
-				`EXEC SP_CATEGORIES_ISSUES ${result.id}, '${result.nameCategory}', ${result.userId}`,
+				"EXEC SP_CATEGORIES_ISSUES :id, :nameCategory, :userId",
+				{
+					replacements: {
+						id: result.id,
+						nameCategory: result.nameCategory,
+						userId: result.userId,
+					},
+				},
 			);
 			sequelize.close();
 			return { msg: "Categoría agregada." };
@@ -48,7 +58,14 @@ export class CategoryModel {
 			});
 			const sequelize = fnSequelize();
 			await sequelize.query(
-				`EXEC SP_CATEGORIES_ISSUES ${result.id}, '${result.nameCategory}', ${result.userId}`,
+				"EXEC SP_CATEGORIES_ISSUES :id, :nameCategory, :userId",
+				{
+					replacements: {
+						id: result.id,
+						nameCategory: result.nameCategory,
+						userId: result.userId,
+					},
+				},
 			);
 			sequelize.close();
 			return { msg: "Categoría actualizada." };

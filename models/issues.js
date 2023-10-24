@@ -6,9 +6,10 @@ export class IssuesModel {
 		try {
 			const sequelize = fnSequelize();
 			const issue = await sequelize.query(
-				`EXEC SP_LST_ISSUES 
-                    ${id}, 
-                    ${nameClient}`,
+				"EXEC SP_LST_ISSUES :id, :nameClient",
+				{
+					replacements: { id, nameClient },
+				},
 			);
 			sequelize.close();
 			return issue;
@@ -51,17 +52,23 @@ export class IssuesModel {
 
 			const sequelize = fnSequelize();
 			await sequelize.query(
-				`EXEC SP_ISSUES 
-				${id}, '${nameClient}', 
-				'${lastnameClient}', 
-				'${motherLastnameClient}', 
-				'${creditNumber}', '${socialNumber}', '${cardNumber}', 
-				'${initialComment}', 
-				${assignTo}, ${userId}, 
-				'${status}', 
-				${parseInt(category)},
-				${parseInt(daysConfig)}
-				`,
+				"EXEC SP_ISSUES :id, :nameClient, :lastnameClient, :motherLastnameClient, :creditNumber, :socialNumber, :cardNumber, :initialComment, :assignTo, :userId, :status, :category, :daysConfig",
+				{
+					replacements: {
+						id,
+						nameClient,
+						lastnameClient,
+						motherLastnameClient,
+						creditNumber,
+						socialNumber,
+						cardNumber,
+						initialComment,
+						assignTo,
+						status,
+						category: parseInt(category),
+						daysConfig: parseInt(daysConfig),
+					},
+				},
 			);
 			sequelize.close();
 
@@ -105,17 +112,23 @@ export class IssuesModel {
 			});
 			const sequelize = fnSequelize();
 			await sequelize.query(
-				`EXEC SP_ISSUES 
-					${id}, '${nameClient}', 
-					'${lastnameClient}', 
-					'${motherLastnameClient}', 
-					'${creditNumber}', '${socialNumber}', '${cardNumber}', 
-					'',
-					${assignTo}, ${req.usuario.id}, 
-					'${status}', 
-					${category},
-					${parseInt(daysConfig)}
-					`,
+				"EXEC SP_ISSUES :id, :nameClient, :lastnameClient, :motherLastnameClient, :creditNumber, :socialNumber, :cardNumber, :initialComment, :assignTo, :userId, :status, :category, :daysConfig",
+				{
+					replacements: {
+						id,
+						nameClient,
+						lastnameClient,
+						motherLastnameClient,
+						creditNumber,
+						socialNumber,
+						cardNumber,
+						initialComment: "",
+						assignTo,
+						status,
+						category: parseInt(category),
+						daysConfig: parseInt(daysConfig),
+					},
+				},
 			);
 			sequelize.close();
 			return { msg: "Incidencia actualizada correctamente" };

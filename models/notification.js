@@ -13,9 +13,15 @@ export class NotificationnModel {
 			});
 			const sequelize = fnSequelize();
 			await sequelize.query(
-				`EXEC SP_NOTIFICATIONS ${id}, '${nameClient}', ${parseInt(
-					userId,
-				)}, ${userAssignated}, 0, 1, NULL`,
+				"EXEC SP_NOTIFICATIONS :id, :nameClient, :userId, :userAssignated, 0, 1, NULL",
+				{
+					replacements: {
+						id,
+						nameClient,
+						userId,
+						userAssignated,
+					},
+				},
 			);
 			sequelize.close();
 			return { msg: "Notificación agregada." };
@@ -38,7 +44,16 @@ export class NotificationnModel {
 		try {
 			const sequelize = fnSequelize();
 			await sequelize.query(
-				`EXEC SP_NOTIFICATIONS ${id}, '${originalClient}', ${userId}, ${userAssignated}, 0, 1, '${newNameClient}'`,
+				"EXEC SP_NOTIFICATIONS :id, :originalClient, :userId, :userAssignated, 0, 1, :newNameClient",
+				{
+					replacements: {
+						id,
+						originalClient,
+						userId,
+						userAssignated,
+						newNameClient,
+					},
+				},
 			);
 			sequelize.close();
 			return { msg: "Notificación Actualizada." };
@@ -51,7 +66,12 @@ export class NotificationnModel {
 		try {
 			const sequelize = fnSequelize();
 			const notifications = await sequelize.query(
-				`EXEC SP_LST_NOTIFICATIONS ${userId}`,
+				"EXEC SP_LST_NOTIFICATIONS :userId",
+				{
+					replacements: {
+						userId,
+					},
+				},
 			);
 			sequelize.close();
 			return notifications;
@@ -66,7 +86,14 @@ export class NotificationnModel {
 		try {
 			const sequelize = fnSequelize();
 			await sequelize.query(
-				`EXEC SP_NOTIFICATIONS ${id}, '', '', '', ${readed}, ${active}, NULL`,
+				"EXEC SP_NOTIFICATIONS :id, '', '', '', :readed, :active, NULL",
+				{
+					replacements: {
+						id,
+						readed,
+						active,
+					},
+				},
 			);
 			sequelize.close();
 			return { msg: "Notificación actualizada." };

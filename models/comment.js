@@ -5,7 +5,9 @@ export class CommentModel {
 	static async getComments({ id = null }) {
 		try {
 			const sequelize = fnSequelize();
-			const comments = await sequelize.query(`EXEC SP_LST_COMMENTS ${id}`);
+			const comments = await sequelize.query("EXEC SP_LST_COMMENTS :id", {
+				replacements: { id },
+			});
 			sequelize.close();
 			return comments;
 		} catch (error) {
@@ -36,7 +38,18 @@ export class CommentModel {
 
 			const sequelize = fnSequelize();
 			await sequelize.query(
-				`EXEC SP_COMMENTS ${id}, '${description}', ${userId}, ${id_issue}, ${userAssignated}, '${status}', '${fileName}'`,
+				"EXEC SP_COMMENTS :id, :description, :userId, :id_issue, :userAssignated, :status, :fileName",
+				{
+					replacements: {
+						id,
+						description,
+						userId,
+						id_issue,
+						userAssignated,
+						status,
+						fileName,
+					},
+				},
 			);
 			sequelize.close();
 			return { msg: "Comentario creado correctamente" };

@@ -12,7 +12,9 @@ export class Login {
 
 		try {
 			const sequelize = fnSequelize();
-			const response = await sequelize.query(`EXEC SP_LOGIN NULL, '${email}'`);
+			const response = await sequelize.query("EXEC SP_LOGIN NULL, :email", {
+				replacements: { email },
+			});
 			sequelize.close();
 
 			if (response?.error) {
@@ -44,7 +46,9 @@ export class Login {
 	static async getUserAuthenticated({ id }) {
 		try {
 			const sequelize = fnSequelize();
-			const usuario = await sequelize.query(`EXEC SP_LOGIN ${id}, NULL`);
+			const usuario = await sequelize.query("EXEC SP_LOGIN :id, NULL", {
+				replacements: { id },
+			});
 			sequelize.close();
 
 			return usuario;

@@ -27,11 +27,17 @@ export class UserModel {
 			const newPass = await bcrypt.hash(password, salt);
 
 			await sequelize.query(
-				`EXEC SP_NEW_USER '${email}', '${newPass}', ${parseInt(
-					category,
-				)}, '${capitlizeFn({ text: name })}', '${capitlizeFn({
-					text: lastname,
-				})}', '${capitlizeFn({ text: motherLastname })}'`,
+				"EXEC SP_NEW_USER :email, :newPass, :category, :nameCapitalize, :lastNameCapitalize, :motherLastNameCapitalize",
+				{
+					replacements: {
+						email,
+						newPass,
+						category: parseInt(category),
+						nameCapitalize: capitlizeFn({ text: name }),
+						lastNameCapitalize: capitlizeFn({ text: lastname }),
+						motherLastNameCapitalize: capitlizeFn({ text: motherLastname }),
+					},
+				},
 			);
 			sequelize.close();
 
