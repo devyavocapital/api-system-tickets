@@ -60,6 +60,9 @@ app.use("/api/v1/categories", tokenApi, categoryRouter);
 app.use("/api/v1/notifications", tokenApi, notificationRouter);
 app.use("/images", tokenApi, routerImages);
 // app.use("/api/v1/stats", tokenApi, statsRouter);
+app.use("/", (req, res) => {
+	res.status(200).json({ msg: "Estas usando la version 1" });
+});
 
 http.listen(PORT, () => {
 	console.log("El servidor esta usando el puerto: ", PORT);
