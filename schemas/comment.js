@@ -1,14 +1,41 @@
-import { z } from "zod";
+import mongoose from "mongoose";
 
-export const commentSchema = z.object({
-	id: z.string().nullable(),
-	description: z
-		.string({ required_error: "La descripción es obligatorio" })
-		.trim()
-		.min(1, { message: "La descripcion no puede ir vacía" }),
-	id_issue: z.number().int().min(1),
-	userAssignated: z.number().int().min(0),
-	status: z.string({ required_error: "El campo status es obligatorio" }),
-	fileName: z.string().nullable().optional(),
-	userId: z.number().int().min(1),
+const CommentSchema = new mongoose.Schema({
+	description: {
+		type: String,
+		required: [true, "La descripción es obligatoria."],
+		trim: true,
+	},
+	idIssue: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: "modelissue",
+		required: [true, "El id de incidencia es necesario."],
+	},
+	userAssignated: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: "modeluser",
+	},
+	status: {
+		type: String,
+		required: [true, "El status es obligatorio."],
+		trim: true,
+	},
+	fileName: {
+		type: String,
+		trim: true,
+	},
+	userId: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: "modeluser",
+	},
+	created_At: {
+		type: Date,
+		default: Date.now(),
+	},
 });
+
+const comments =
+	mongoose.models["modelcomment"] ||
+	mongoose.model("modelcomment", CommentSchema);
+
+export default comments;

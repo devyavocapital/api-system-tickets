@@ -1,79 +1,69 @@
-import { fnSequelize } from "../db/config.js";
-import { categorySchema } from "../schemas/category.js";
+import mongoose from "mongoose";
+import { urlApi } from "../db/config.js";
+import categories from "../schemas/category.js";
 
 export class CategoryModel {
-	static async getCategories({ id = "null" }) {
+	static async getCategories() {
 		try {
-			const sequelize = fnSequelize();
-			const categories = await sequelize.query(
-				"EXEC SP_LST_CATEGORY_ISSUES :id",
-				{
-					replacements: { id },
-				},
-			);
-			sequelize.close();
-			return categories;
+			await mongoose.connect(urlApi);
+			const categoriesList = await categories.find();
+			await mongoose.disconnect();
+			return categoriesList;
 		} catch (error) {
 			console.log(error);
 			return { error: "Hubo un error" };
 		}
 	}
 
-	static async createCategory({ id = "null", nameCategory, userId }) {
+	static async createCategory({ nameCategory, userId }) {
 		try {
-			const result = await categorySchema.parseAsync({
-				id,
-				nameCategory,
-				userId: parseInt(userId),
-			});
+			await mongoose.connect(urlApi);
 
-			const sequelize = fnSequelize();
-			await sequelize.query(
-				"EXEC SP_CATEGORIES_ISSUES :id, :nameCategory, :userId",
-				{
-					replacements: {
-						id: result.id,
-						nameCategory: result.nameCategory,
-						userId: result.userId,
-					},
-				},
-			);
-			sequelize.close();
-			return { msg: "Categoría agregada." };
-		} catch (error) {
-			if (error.errors) {
-				return { zodError: error?.errors };
+			const categoryExist = await categories.findOne({ nameCategory });
+			if (categoryExist) {
+				return {
+					error: "Error: Ya existe una categoría con este nombre",
+					status: 401,
+				};
 			}
 
-			return { error: "Hubo un error" };
+			const newCategory = await categories({
+				nameCategory,
+				userId,
+			});
+
+			await newCategory.save();
+
+			await mongoose.disconnect();
+			return { msg: "Categoría agregada.", status: 201 };
+		} catch (error) {
+			console.log({ errorMongo: error });
+			return { error };
 		}
 	}
 
 	static async updateCategory({ id, nameCategory, userId }) {
 		try {
-			const result = await categorySchema.parseAsync({
-				id,
-				nameCategory,
-				userId: parseInt(userId),
-			});
-			const sequelize = fnSequelize();
-			await sequelize.query(
-				"EXEC SP_CATEGORIES_ISSUES :id, :nameCategory, :userId",
-				{
-					replacements: {
-						id: result.id,
-						nameCategory: result.nameCategory,
-						userId: result.userId,
-					},
-				},
-			);
-			sequelize.close();
-			return { msg: "Categoría actualizada." };
-		} catch (error) {
-			if (error.errors) {
-				return { zodError: error?.errors };
+			await mongoose.connect(urlApi);
+
+			const categoryExist = await categories.findById(id);
+			if (!categoryExist) {
+				return {
+					error: "Error: No existe una categoría con este ID",
+					status: 401,
+				};
 			}
-			return { error: "Hubo un error" };
+
+			await categories.findByIdAndUpdate(id, {
+				nameCategory,
+				userId,
+			});
+
+			await mongoose.disconnect();
+			return { msg: "Categoría actualizada correctamente.", status: 200 };
+		} catch (error) {
+			console.log(error);
+			return { error };
 		}
 	}
 }

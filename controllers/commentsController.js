@@ -1,25 +1,69 @@
 import { CommentModel } from "../models/comment.js";
 
 export const getComments = async (req, res) => {
-	const { id } = req.query;
+	const { idIssue } = req.query;
 
-	const response = await CommentModel.getComments({ id });
-	return res.json(response);
+	try {
+		const response = await CommentModel.getComments({ idIssue });
+		return res.json(response);
+	} catch (error) {
+		console.log(error);
+	}
 };
 
 export const createComment = async (req, res) => {
-	const { id, description, id_issue, userAssignated, status, fileName } =
-		req.body;
+	const { description, idIssue, userAssignated, status, fileName } = req.body;
 
-	const response = await CommentModel.createComment({
-		id,
-		description,
-		id_issue,
-		userAssignated,
-		status,
-		fileName,
-		userId: req.usuario.id,
-	});
+	const userId = req.usuario.id;
 
-	return res.json(response);
+	try {
+		const response = await CommentModel.createComment({
+			description,
+			idIssue,
+			userAssignated,
+			status,
+			fileName,
+			userId,
+		});
+
+		if (response?.error) {
+			if (response.error?.errors) {
+				return res.status(400).json(response.error.errors);
+			}
+			return res.status(400).json(response);
+		}
+
+		return res.status(response.status).json(response);
+	} catch (error) {
+		console.log(error);
+	}
+};
+
+export const updateComment = async (req, res) => {
+	const { description, idIssue, userAssignated, status, fileName } = req.body;
+	const { id } = req.query;
+	const userId = req.usuario.id;
+
+	try {
+		const response = await CommentModel.updateComment({
+			id,
+			description,
+			idIssue,
+			userAssignated,
+			status,
+			fileName,
+			userId,
+		});
+
+		if (response?.error) {
+			if (response.error?.errors) {
+				return res.status(400).json(response.error.errors);
+			}
+			return res.status(400).json(response);
+		}
+
+		return res.status(response.status).json(response);
+	} catch (error) {
+		console.log(error);
+	}
 };

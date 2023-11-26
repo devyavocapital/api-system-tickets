@@ -1,15 +1,22 @@
-import { fnSequelize } from "../db/config.js";
-import { commentSchema } from "../schemas/comment.js";
+import mongoose from "mongoose";
+import { urlApi } from "../db/config.js";
+import comments from "../schemas/comment.js";
 
 export class CommentModel {
-	static async getComments({ id = null }) {
+	static async getComments({ idIssue = null }) {
 		try {
-			const sequelize = fnSequelize();
-			const comments = await sequelize.query("EXEC SP_LST_COMMENTS :id", {
-				replacements: { id },
-			});
-			sequelize.close();
-			return comments;
+			await mongoose.connect(urlApi);
+
+			if (idIssue !== null) {
+				const commentsList = await comments.find({ idIssue });
+				await mongoose.disconnect();
+				return commentsList;
+			}
+
+			const commentsList = await comments.find();
+			await mongoose.disconnect();
+
+			return commentsList;
 		} catch (error) {
 			console.log(error);
 			return { error: "Hubo un error" };
@@ -17,47 +24,71 @@ export class CommentModel {
 	}
 
 	static async createComment({
-		id = "null",
 		description,
-		id_issue,
-		userAssignated = 0,
+		idIssue,
+		userAssignated,
 		status,
 		fileName,
 		userId,
 	}) {
 		try {
-			await commentSchema.parseAsync({
-				id,
+			await mongoose.connect(urlApi);
+
+			const newComment = comments({
 				description,
-				id_issue,
+				userId,
+				idIssue,
 				userAssignated,
 				status,
 				fileName,
-				userId: parseInt(userId),
 			});
 
-			const sequelize = fnSequelize();
-			await sequelize.query(
-				"EXEC SP_COMMENTS :id, :description, :userId, :id_issue, :userAssignated, :status, :fileName",
-				{
-					replacements: {
-						id,
-						description,
-						userId,
-						id_issue,
-						userAssignated,
-						status,
-						fileName,
-					},
-				},
-			);
-			sequelize.close();
-			return { msg: "Comentario creado correctamente" };
+			await newComment.save();
+			await mongoose.disconnect();
+
+			return { msg: "Comentario creado correctamente", status: 201 };
 		} catch (error) {
-			if (error.errors) {
-				return { zodError: error?.errors };
+			console.log({ errorMongo: error });
+			return { error };
+		}
+	}
+
+	static async updateComment({
+		id,
+		description,
+		idIssue,
+		userAssignated,
+		status,
+		fileName,
+		userId,
+	}) {
+		try {
+			await mongoose.connect(urlApi);
+
+			const commentExist = await comments.findById(id);
+
+			if (!commentExist) {
+				return {
+					error: "Error: No existe comentario con este ID.",
+					status: 401,
+				};
 			}
-			return { error: "Hubo un error" };
+
+			await comments.findByIdAndUpdate(id, {
+				description,
+				userId,
+				idIssue,
+				userAssignated,
+				status,
+				fileName,
+			});
+
+			await mongoose.disconnect();
+
+			return { msg: "Comentario actualizado correctamente", status: 200 };
+		} catch (error) {
+			console.log({ errorMongo: error });
+			return { error };
 		}
 	}
 }

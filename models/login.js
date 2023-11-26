@@ -1,29 +1,28 @@
 import bcrypt from "bcrypt";
-import { fnSequelize } from "../db/config.js";
-import { loginSchema } from "../schemas/login.js";
+import mongoose from "mongoose";
+import { urlApi } from "../db/config.js";
+import user from "../schemas/user.js";
 
 export class Login {
 	static async getLogin({ email, password }) {
-		const zodError = await loginSchema.safeParseAsync({ email, password });
-
-		if (!zodError.success) {
-			return { error: zodError.error.issues };
+		if (!email || !password) {
+			return { error: "Error: Campo email o password está vacío." };
 		}
 
 		try {
-			const sequelize = fnSequelize();
-			const response = await sequelize.query("EXEC SP_LOGIN NULL, :email", {
-				replacements: { email },
-			});
-			sequelize.close();
+			await mongoose.connect(urlApi);
 
-			if (response?.error) {
-				return { error: response.error };
+			const userExist = await user.findOne({ email });
+			if (!userExist) {
+				return {
+					error: "El usuario no existe, favor de validar su cuenta de email.",
+				};
 			}
 
-			const user = response[0];
-
-			const passwordCorrect = await bcrypt.compare(password, user[0].password);
+			const passwordCorrect = await bcrypt.compare(
+				password,
+				userExist.password,
+			);
 
 			if (!passwordCorrect) {
 				return { error: "Error: El password es incorrecto" };
@@ -31,26 +30,26 @@ export class Login {
 
 			const payload = {
 				usuario: {
-					id: user[0].id,
+					id: userExist.id,
 				},
 			};
 
+			await mongoose.disconnect();
 			return payload;
 		} catch (error) {
 			console.log(error);
-			const errorLog = `${error.original}`;
-			return { error: errorLog };
+			return { error };
 		}
 	}
 
 	static async getUserAuthenticated({ id }) {
 		try {
-			const sequelize = fnSequelize();
-			const usuario = await sequelize.query("EXEC SP_LOGIN :id, NULL", {
-				replacements: { id },
-			});
-			sequelize.close();
+			await mongoose.connect(urlApi);
+			const usuario = await user
+				.findById(id)
+				.select(["_id", "email", "name", "lastname", "category"]);
 
+			await mongoose.disconnect();
 			return usuario;
 		} catch (error) {
 			console.log(error);

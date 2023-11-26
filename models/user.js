@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
-import { fnSequelize } from "../db/config.js";
-import { userSchema } from "../schemas/user.js";
-import { capitlizeFn } from "../utils/capitalizeFn.js";
+import mongoose from "mongoose";
+import { urlApi } from "../db/config.js";
+import user from "../schemas/user.js";
 
 export class UserModel {
 	static async createUser({
@@ -13,41 +13,37 @@ export class UserModel {
 		motherLastname,
 	}) {
 		try {
-			await userSchema.parseAsync({
+			await mongoose.connect(urlApi);
+
+			if (!password) {
+				return { error: "Debe de especificar su password.", status: 400 };
+			}
+
+			const userExist = await user.find({ email });
+
+			if (userExist) {
+				return { error: "Ya existe un usuario con este correo.", status: 400 };
+			}
+
+			const salt = await bcrypt.genSalt(10);
+			const newPass = await bcrypt.hash(password, salt);
+
+			const newUser = user({
 				email,
-				password,
+				password: newPass,
 				category: parseInt(category),
 				name,
 				lastname,
 				motherLastname,
 			});
-			const sequelize = fnSequelize();
-			// hashear password
-			const salt = await bcrypt.genSalt(10);
-			const newPass = await bcrypt.hash(password, salt);
+			await newUser.save();
 
-			await sequelize.query(
-				"EXEC SP_NEW_USER :email, :newPass, :category, :nameCapitalize, :lastNameCapitalize, :motherLastNameCapitalize",
-				{
-					replacements: {
-						email,
-						newPass,
-						category: parseInt(category),
-						nameCapitalize: capitlizeFn({ text: name }),
-						lastNameCapitalize: capitlizeFn({ text: lastname }),
-						motherLastNameCapitalize: capitlizeFn({ text: motherLastname }),
-					},
-				},
-			);
-			sequelize.close();
+			await mongoose.disconnect();
 
-			return { msg: "Usuario creado correctamente" };
+			return { msg: "Usuario creado correctamente", status: 201 };
 		} catch (error) {
-			if (error.errors) {
-				return { zodError: error?.errors };
-			}
-			const errorLog = `${error.original}`;
-			return { error: errorLog };
+			console.log({ errorMongo: error });
+			return { error };
 		}
 	}
 }

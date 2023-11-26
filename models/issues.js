@@ -1,18 +1,30 @@
-import { fnSequelize } from "../db/config.js";
-import { issueSchema } from "../schemas/issue.js";
+import mongoose from "mongoose";
+import { urlApi } from "../db/config.js";
+import issue from "../schemas/issue.js";
 
 export class IssuesModel {
 	static async getIssues({ id = "null", nameClient }) {
 		try {
-			const sequelize = fnSequelize();
-			const issue = await sequelize.query(
-				"EXEC SP_LST_ISSUES :id, :nameClient",
-				{
-					replacements: { id, nameClient },
-				},
-			);
-			sequelize.close();
-			return issue;
+			await mongoose.connect(urlApi);
+
+			if (id !== "null") {
+				const issuesList = await issue.findById(id);
+				await mongoose.disconnect();
+				return issuesList;
+			}
+
+			if (id === "null" && nameClient) {
+				const issuesList = await issue.find({
+					nameClient: { $regex: nameClient },
+				});
+				await mongoose.disconnect();
+				return issuesList;
+			}
+
+			const issuesList = await issue.find();
+			await mongoose.disconnect();
+
+			return issuesList;
 		} catch (error) {
 			console.log(error);
 			return { error: "Hubo un error" };
@@ -20,7 +32,6 @@ export class IssuesModel {
 	}
 
 	static async createIssue({
-		id = "null",
 		nameClient,
 		lastnameClient = "null",
 		motherLastnameClient = "null",
@@ -35,8 +46,9 @@ export class IssuesModel {
 		userId,
 	}) {
 		try {
-			await issueSchema.parseAsync({
-				id,
+			await mongoose.connect(urlApi);
+
+			const newIssue = issue({
 				nameClient,
 				lastnameClient,
 				motherLastnameClient,
@@ -46,39 +58,17 @@ export class IssuesModel {
 				initialComment,
 				assignTo,
 				status,
-				category: parseInt(category),
-				daysConfig: parseInt(daysConfig),
+				category,
+				daysConfig,
+				userId,
 			});
 
-			const sequelize = fnSequelize();
-			await sequelize.query(
-				"EXEC SP_ISSUES :id, :nameClient, :lastnameClient, :motherLastnameClient, :creditNumber, :socialNumber, :cardNumber, :initialComment, :assignTo, :userId, :status, :category, :daysConfig",
-				{
-					replacements: {
-						id,
-						nameClient,
-						lastnameClient,
-						motherLastnameClient,
-						creditNumber,
-						socialNumber,
-						cardNumber,
-						initialComment,
-						assignTo,
-						status,
-						category: parseInt(category),
-						daysConfig: parseInt(daysConfig),
-					},
-				},
-			);
-			sequelize.close();
-
+			await newIssue.save();
+			await mongoose.disconnect();
 			return { msg: "Incidencia creada correctamente" };
 		} catch (error) {
 			console.log(error);
-			if (error.errors) {
-				return { zodError: error?.errors };
-			}
-			return { error: "Hubo un error" };
+			return { error };
 		}
 	}
 
@@ -96,47 +86,35 @@ export class IssuesModel {
 		daysConfig,
 	}) {
 		try {
-			await issueSchema.parseAsync({
-				id,
+			await mongoose.connect(urlApi);
+
+			const issueExist = await issue.findById(id);
+			if (!issueExist) {
+				return {
+					error: "Error: No existe incidencia con este ID.",
+					status: 401,
+				};
+			}
+
+			await issue.findByIdAndUpdate(id, {
 				nameClient,
 				lastnameClient,
 				motherLastnameClient,
 				creditNumber,
 				socialNumber,
 				cardNumber,
-				initialComment,
 				assignTo,
 				status,
-				category,
+				category: parseInt(category),
 				daysConfig: parseInt(daysConfig),
 			});
-			const sequelize = fnSequelize();
-			await sequelize.query(
-				"EXEC SP_ISSUES :id, :nameClient, :lastnameClient, :motherLastnameClient, :creditNumber, :socialNumber, :cardNumber, :initialComment, :assignTo, :userId, :status, :category, :daysConfig",
-				{
-					replacements: {
-						id,
-						nameClient,
-						lastnameClient,
-						motherLastnameClient,
-						creditNumber,
-						socialNumber,
-						cardNumber,
-						initialComment: "",
-						assignTo,
-						status,
-						category: parseInt(category),
-						daysConfig: parseInt(daysConfig),
-					},
-				},
-			);
-			sequelize.close();
-			return { msg: "Incidencia actualizada correctamente" };
+
+			await mongoose.disconnect();
+
+			return { msg: "Incidencia actualizada correctamente", status: 200 };
 		} catch (error) {
-			if (error.errors) {
-				return { zodError: error?.errors };
-			}
-			return { error: "Hubo un error" };
+			console.log(error);
+			return { error };
 		}
 	}
 }

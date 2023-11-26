@@ -1,6 +1,10 @@
 import { NameModel } from "../models/name.js";
 
 export const getNames = async (req, res) => {
-	const response = await NameModel.getNames();
-	return res.json(response);
+	try {
+		const response = await NameModel.getNames();
+		return res.json(response);
+	} catch (error) {
+		console.log(error);
+	}
 };

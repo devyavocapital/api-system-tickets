@@ -4,6 +4,7 @@ import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 
+import { tokenApi } from "./middleware/tokenApi.js";
 import { categoryRouter } from "./routes/categories.js";
 import { commentRouter } from "./routes/comments.js";
 import { createUserRouter } from "./routes/createUser.js";
@@ -12,7 +13,7 @@ import { issuesRouter } from "./routes/issues.js";
 import { loginRouter } from "./routes/login.js";
 import { namesRouter } from "./routes/names.js";
 import { notificationRouter } from "./routes/notifications.js";
-import { statsRouter } from "./routes/stats.js";
+// import { statsRouter } from "./routes/stats.js";
 
 const app = express();
 const http = createServer(app);
@@ -50,15 +51,15 @@ socketIO.on("connection", (socket) => {
 	});
 });
 
-app.use("/api/v1/login", loginRouter);
-app.use("/api/v1/create", createUserRouter);
-app.use("/api/v1/issues", issuesRouter);
-app.use("/api/v1/comments", commentRouter);
-app.use("/api/v1/names", namesRouter);
-app.use("/api/v1/categories", categoryRouter);
-app.use("/api/v1/notifications", notificationRouter);
-app.use("/images", routerImages);
-app.use("/api/v1/stats", statsRouter);
+app.use("/api/v1/login", tokenApi, loginRouter);
+app.use("/api/v1/create", tokenApi, createUserRouter);
+app.use("/api/v1/issues", tokenApi, issuesRouter);
+app.use("/api/v1/comments", tokenApi, commentRouter);
+app.use("/api/v1/names", tokenApi, namesRouter);
+app.use("/api/v1/categories", tokenApi, categoryRouter);
+app.use("/api/v1/notifications", tokenApi, notificationRouter);
+app.use("/images", tokenApi, routerImages);
+// app.use("/api/v1/stats", tokenApi, statsRouter);
 
 http.listen(PORT, () => {
 	console.log("El servidor esta usando el puerto: ", PORT);

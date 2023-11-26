@@ -2,33 +2,49 @@ import { CategoryModel } from "../models/category.js";
 
 export const createCategory = async (req, res) => {
 	const { nameCategory } = req.body;
+	const userId = req.usuario.id;
 
-	const id = "null";
+	try {
+		const response = await CategoryModel.createCategory({
+			nameCategory,
+			userId,
+		});
 
-	const response = await CategoryModel.createCategory({
-		id,
-		nameCategory,
-		userId: req.usuario.id,
-	});
+		if (response?.error) {
+			if (response.error?.errors) {
+				return res.status(400).json(response.error.errors);
+			}
+			return res.status(400).json(response);
+		}
 
-	return res.json(response);
+		return res.status(response.status).json(response);
+	} catch (error) {
+		console.log(error);
+	}
 };
 
 export const getCategories = async (req, res) => {
-	const { id } = req.query;
-
-	const response = await CategoryModel.getCategories({ id });
-	return res.json(response);
+	try {
+		const response = await CategoryModel.getCategories();
+		return res.status(200).json(response);
+	} catch (error) {
+		console.log(error);
+	}
 };
 
 export const updateCategory = async (req, res) => {
 	const { nameCategory } = req.body;
 	const { id } = req.query;
+	const userId = req.usuario.id;
 
-	const response = await CategoryModel.updateCategory({
-		id,
-		nameCategory,
-		userId: req.usuario.id,
-	});
-	return res.json(response);
+	try {
+		const response = await CategoryModel.updateCategory({
+			id,
+			nameCategory,
+			userId,
+		});
+		return res.status(response.status).json(response);
+	} catch (error) {
+		console.log(error);
+	}
 };

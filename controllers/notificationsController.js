@@ -2,50 +2,86 @@ import { NotificationnModel } from "../models/notification.js";
 
 export const createNotification = async (req, res) => {
 	const { nameClient, userAssignated } = req.body;
+	const userId = req.usuario.id;
+	try {
+		const response = await NotificationnModel.createNotification({
+			nameClient,
+			userId,
+			userAssignated,
+		});
 
-	const id = "null";
+		if (response?.error) {
+			if (response.error?.errors) {
+				return res.status(400).json(response.error.errors);
+			}
+			return res.status(400).json(response);
+		}
 
-	const response = await NotificationnModel.createNotification({
-		id,
-		nameClient,
-		userId: req.usuario.id,
-		userAssignated,
-	});
-
-	return res.json(response);
+		return res.status(response.status).json(response);
+	} catch (error) {
+		console.log(error);
+	}
 };
 
 export const updateDataNotification = async (req, res) => {
-	const { originalClient, userAssignated, newNameClient } = req.body;
-	const id = "null";
+	const { userAssignated, nameClient } = req.body;
+	const { id } = req.query;
+	const userId = req.usuario.id;
 
-	const response = await NotificationnModel.updateDataNotification({
-		id,
-		originalClient,
-		userAssignated,
-		newNameClient,
-		userId: req.usuario.id,
-	});
+	try {
+		const response = await NotificationnModel.updateDataNotification({
+			id,
+			userAssignated,
+			nameClient,
+			userId,
+		});
 
-	return res.json(response);
+		if (response?.error) {
+			if (response.error?.errors) {
+				return res.status(400).json(response.error.errors);
+			}
+			return res.status(400).json(response);
+		}
+
+		return res.status(response.status).json(response);
+	} catch (error) {
+		console.log(error);
+	}
 };
 
 export const getNotifications = async (req, res) => {
-	const response = await NotificationnModel.getNotifications({
-		userId: req.usuario.id,
-	});
+	const userId = req.usuario.id;
 
-	return res.json(response);
+	try {
+		const response = await NotificationnModel.getNotifications({
+			userId,
+		});
+		return res.json(response);
+	} catch (error) {
+		console.log(error);
+	}
 };
 
-export const updateNotification = async (req, res) => {
-	const { id, readed, active } = req.body;
+export const patchNotification = async (req, res) => {
+	const { readed, active } = req.body;
+	const { id } = req.query;
 
-	const response = await NotificationnModel.updateNotification({
-		id,
-		readed,
-		active,
-	});
+	try {
+		const response = await NotificationnModel.updateNotification({
+			id,
+			readed,
+			active,
+		});
 
-	return res.json(response);
+		if (response?.error) {
+			if (response.error?.errors) {
+				return res.status(400).json(response.error.errors);
+			}
+			return res.status(400).json(response);
+		}
+
+		return res.status(response.status).json(response);
+	} catch (error) {
+		console.log(error);
+	}
 };

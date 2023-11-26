@@ -1,11 +1,15 @@
-import { fnSequelize } from "../db/config.js";
+import mongoose from "mongoose";
+import { urlApi } from "../db/config.js";
+import user from "../schemas/user.js";
 
 export class NameModel {
 	static async getNames() {
 		try {
-			const sequelize = fnSequelize();
-			const names = await sequelize.query("EXEC SP_LST_NAMES");
-			sequelize.close();
+			await mongoose.connect(urlApi);
+
+			const names = await user.find().select(["_id", "name", "lastname"]);
+
+			await mongoose.disconnect();
 			return names;
 		} catch (error) {
 			console.log(error);

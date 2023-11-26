@@ -1,33 +1,52 @@
-import { z } from "zod";
+import mongoose from "mongoose";
 
-export const userSchema = z.object({
-	email: z
-		.string({ required_error: "El email es obligatorio" })
-		.email({ message: "Correo inválido" })
-		.trim()
-		.toLowerCase(),
-	password: z
-		.string({ required_error: "La contraseña es obligatoria" })
-		.min(8, { message: "Debe tener mínimo 8 caracteres" })
-		.max(16, { message: "Debe tener un máximo de 16 caracteres" })
-		.regex(/^(?=.*d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^wds:])([^s]){8,16}/, {
-			message: "No contiene ningun caracter especial, ni longitud necesaria",
-		})
-		.trim()
-		.toLowerCase(),
-	category: z
-		.number({ message: "La categoria debe ser especificada" })
-		.int()
-		.min(1),
-	name: z
-		.string({ required_error: "El nombre es obligatorio" })
-		.trim()
-		.min(1, { message: "El nombre no puede ir vacío" })
-		.toLowerCase(),
-	lastname: z
-		.string({ required_error: "El apellido paterno es obligatorio" })
-		.trim()
-		.min(1, { message: "El apellido paterno no puede ir vacío" })
-		.toLowerCase(),
-	motherLastname: z.string().toLowerCase().trim().optional(),
+const UserSchema = new mongoose.Schema({
+	email: {
+		type: String,
+		required: [true, "El campo email es requerido"],
+		trim: true,
+		unique: true,
+		lowercase: true,
+	},
+	password: {
+		type: String,
+		required: [true, "El campo password es requerido"],
+		trim: true,
+	},
+	name: {
+		type: String,
+		required: [true, "El campo nombre es requerido"],
+		trim: true,
+		min: [3, "Debe tener minimo 3 caracteres"],
+		max: [30, "Debe tener máximo 30 caracteres"],
+		lowercase: true,
+	},
+	lastname: {
+		type: String,
+		required: [true, "El campo apellido es requerido"],
+		trim: true,
+		min: [3, "Debe tener minimo 3 caracteres"],
+		max: [30, "Debe tener máximo 30 caracteres"],
+		lowercase: true,
+	},
+	motherLastname: {
+		type: String,
+		trim: true,
+		lowercase: true,
+	},
+	category: {
+		type: Number,
+		required: [true, "La categoría debe de ser especificada."],
+		min: 1,
+		default: 2,
+	},
+	created_At: {
+		type: Date,
+		default: Date.now(),
+	},
 });
+
+const user =
+	mongoose.models["modeluser"] || mongoose.model("modeluser", UserSchema);
+
+export default user;

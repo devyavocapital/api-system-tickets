@@ -1,10 +1,22 @@
-import { z } from "zod";
+import mongoose from "mongoose";
 
-export const categorySchema = z.object({
-	id: z.string().nullable(),
-	nameCategory: z
-		.string({ required_error: "El nombre de la categoría es obligatorio" })
-		.trim()
-		.min(1, { message: "La descripcion no puede ir vacía" }),
-	userId: z.number().int().min(1),
+const CategorySchema = new mongoose.Schema({
+	nameCategory: {
+		type: String,
+		required: [true, "Nombre de categpría obligatorio."],
+		trim: true,
+	},
+	userId: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: "modeluser",
+	},
+	created_At: {
+		type: Date,
+		default: Date.now(),
+	},
 });
+const categories =
+	mongoose.models["modelcategory"] ||
+	mongoose.model("modelcategory", CategorySchema);
+
+export default categories;

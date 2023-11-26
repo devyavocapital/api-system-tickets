@@ -1,102 +1,89 @@
-import { fnSequelize } from "../db/config.js";
-import { notificationSchema } from "../schemas/notification.js";
+import mongoose from "mongoose";
+import { urlApi } from "../db/config.js";
+import notifications from "../schemas/notification.js";
 
 export class NotificationnModel {
-	static async createNotification({ id, nameClient, userId, userAssignated }) {
-		// [dbo].[SP_NOTIFICATIONS] (@ID_NOTIFICATION INT, @CLIENT VARCHAR(MAX), @USER_CREATED INT, @USER_ASSIGNATED INT, @READED BIT, @ACTIVE BIT)
+	static async createNotification({ nameClient, userId, userAssignated }) {
 		try {
-			await notificationSchema.parseAsync({
-				id,
+			await mongoose.connect(urlApi);
+
+			const newNotification = notifications({
 				nameClient,
 				userId,
 				userAssignated,
 			});
-			const sequelize = fnSequelize();
-			await sequelize.query(
-				"EXEC SP_NOTIFICATIONS :id, :nameClient, :userId, :userAssignated, 0, 1, NULL",
-				{
-					replacements: {
-						id,
-						nameClient,
-						userId,
-						userAssignated,
-					},
-				},
-			);
-			sequelize.close();
-			return { msg: "Notificación agregada." };
+
+			await newNotification.save();
+
+			await mongoose.disconnect();
+			return { msg: "Notificación agregada.", status: 200 };
 		} catch (error) {
-			if (error.errors) {
-				return { zodError: error?.errors };
-			}
-			return { error: "Hubo un error" };
+			console.log(error);
+			return { error };
 		}
 	}
 
 	static async updateDataNotification({
 		id,
-		originalClient,
 		userAssignated,
-		newNameClient,
+		nameClient,
 		userId,
 	}) {
-		// [dbo].[SP_NOTIFICATIONS] (@ID_NOTIFICATION INT, @CLIENT VARCHAR(MAX), @USER_CREATED INT, @USER_ASSIGNATED INT, @READED BIT, @ACTIVE BIT)
 		try {
-			const sequelize = fnSequelize();
-			await sequelize.query(
-				"EXEC SP_NOTIFICATIONS :id, :originalClient, :userId, :userAssignated, 0, 1, :newNameClient",
-				{
-					replacements: {
-						id,
-						originalClient,
-						userId,
-						userAssignated,
-						newNameClient,
-					},
-				},
-			);
-			sequelize.close();
-			return { msg: "Notificación Actualizada." };
+			await mongoose.connect(urlApi);
+
+			const notExist = await notifications.findById(id);
+			if (!notExist) {
+				return {
+					error: "Error: No existe ninguna notificación con este ID",
+					status: 401,
+				};
+			}
+
+			const newNotification = await notifications.findByIdAndUpdate(id, {
+				userAssignated,
+				nameClient,
+				userId,
+			});
+
+			await mongoose.disconnect();
+			return { msg: "Notificación Actualizada.", status: 200, newNotification };
 		} catch (error) {
-			return { error: "Hubo un error" };
+			return { error };
 		}
 	}
 
 	static async getNotifications({ userId }) {
 		try {
-			const sequelize = fnSequelize();
-			const notifications = await sequelize.query(
-				"EXEC SP_LST_NOTIFICATIONS :userId",
-				{
-					replacements: {
-						userId,
-					},
-				},
-			);
-			sequelize.close();
-			return notifications;
+			await mongoose.connect(urlApi);
+			const notificationsList = await notifications.find({ userId });
+			await mongoose.disconnect();
+			return notificationsList;
 		} catch (error) {
 			console.log(error);
-			return { error: "Hubo un error" };
+			return { error };
 		}
 	}
 
 	static async updateNotification({ id, readed, active }) {
-		// [dbo].[SP_NOTIFICATIONS] (@ID_NOTIFICATION INT, @CLIENT VARCHAR(MAX), @USER_CREATED INT, @USER_ASSIGNATED INT, @READED BIT, @ACTIVE BIT)
 		try {
-			const sequelize = fnSequelize();
-			await sequelize.query(
-				"EXEC SP_NOTIFICATIONS :id, '', '', '', :readed, :active, NULL",
-				{
-					replacements: {
-						id,
-						readed,
-						active,
-					},
-				},
-			);
-			sequelize.close();
-			return { msg: "Notificación actualizada." };
+			await mongoose.connect(urlApi);
+
+			const notExist = await notifications.findById(id);
+			if (!notExist) {
+				return {
+					error: { Error: "Ya no existe esta notificación" },
+					status: 401,
+				};
+			}
+
+			await notifications.findByIdAndUpdate(id, {
+				readed,
+				active,
+			});
+
+			await mongoose.disconnect();
+			return { msg: "Notificación actualizada.", status: 200 };
 		} catch (error) {
 			console.log(error);
 			return { error: "Hubo un error" };
