@@ -19,7 +19,7 @@ export class UserModel {
 				return { error: "Debe de especificar su password.", status: 400 };
 			}
 
-			const userExist = await user.find({ email });
+			const userExist = await user.findOne({ email });
 
 			if (userExist) {
 				return { error: "Ya existe un usuario con este correo.", status: 400 };

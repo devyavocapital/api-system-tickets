@@ -3,7 +3,7 @@ import { urlApi } from "../db/config.js";
 import issue from "../schemas/issue.js";
 
 export class IssuesModel {
-	static async getIssues({ id = "null", nameClient }) {
+	static async getIssues({ id = "null", nameClient = "null" }) {
 		try {
 			await mongoose.connect(urlApi);
 
@@ -13,7 +13,7 @@ export class IssuesModel {
 				return issuesList;
 			}
 
-			if (id === "null" && nameClient) {
+			if (id === "null" && nameClient !== "null") {
 				const issuesList = await issue.find({
 					nameClient: { $regex: nameClient },
 				});
@@ -63,9 +63,9 @@ export class IssuesModel {
 				userId,
 			});
 
-			await newIssue.save();
+			const issueAdded = await newIssue.save();
 			await mongoose.disconnect();
-			return { msg: "Incidencia creada correctamente" };
+			return { msg: "Incidencia creada correctamente", issueAdded };
 		} catch (error) {
 			console.log(error);
 			return { error };

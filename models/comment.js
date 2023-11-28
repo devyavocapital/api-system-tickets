@@ -8,12 +8,41 @@ export class CommentModel {
 			await mongoose.connect(urlApi);
 
 			if (idIssue !== null) {
-				const commentsList = await comments.find({ idIssue });
+				console.log("getting comments");
+				const commentsList = await comments.aggregate([
+					{
+						$match: {
+							idIssue: new mongoose.Types.ObjectId(idIssue),
+						},
+					},
+					{
+						$lookup: {
+							from: "modelusers",
+							localField: "userId",
+							foreignField: "_id",
+							as: "user",
+						},
+					},
+					{
+						$unset: ["userId", "idIssue"],
+					},
+					{
+						$project: {
+							_id: 1,
+							description: 1,
+							status: 1,
+							created_At: 1,
+							fileName: 1,
+							"user.email": 1,
+							"user.name": 1,
+							"user.lastname": 1,
+						},
+					},
+				]);
 				await mongoose.disconnect();
 				return commentsList;
 			}
 
-			const commentsList = await comments.find();
 			await mongoose.disconnect();
 
 			return commentsList;
@@ -28,7 +57,7 @@ export class CommentModel {
 		idIssue,
 		userAssignated,
 		status,
-		fileName,
+		fileName = null,
 		userId,
 	}) {
 		try {

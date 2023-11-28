@@ -58,7 +58,7 @@ app.use("/api/v1/comments", tokenApi, commentRouter);
 app.use("/api/v1/names", tokenApi, namesRouter);
 app.use("/api/v1/categories", tokenApi, categoryRouter);
 app.use("/api/v1/notifications", tokenApi, notificationRouter);
-app.use("/images", tokenApi, routerImages);
+app.use("/images", routerImages);
 // app.use("/api/v1/stats", tokenApi, statsRouter);
 app.use("/", (req, res) => {
 	res.status(200).json({ msg: "Estas usando la version 1" });

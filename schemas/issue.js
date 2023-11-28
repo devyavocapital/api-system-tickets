@@ -31,8 +31,8 @@ const IssueSchema = new mongoose.Schema({
 		trim: true,
 	},
 	assingTo: {
-		type: Number,
-		trim: true,
+		type: mongoose.Schema.Types.ObjectId,
+		ref: "modeluser",
 	},
 	status: {
 		type: String,
