@@ -9,7 +9,6 @@ export class CommentModel {
 			await mongoose.connect(urlApi);
 
 			if (idIssue !== null) {
-				console.log("getting comments");
 				const commentsList = await comments.aggregate([
 					{
 						$match: {
@@ -63,7 +62,11 @@ export class CommentModel {
 	}) {
 		try {
 			await mongoose.connect(urlApi);
-
+			console.log({
+				idIssue,
+				assignTo,
+				status,
+			});
 			const newComment = comments({
 				description,
 				userId,
