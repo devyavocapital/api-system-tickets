@@ -1,13 +1,13 @@
 import { NotificationnModel } from "../models/notification.js";
 
 export const createNotification = async (req, res) => {
-	const { nameClient, userAssignated } = req.body;
+	const { nameClient, assignTo } = req.body;
 	const userId = req.usuario.id;
 	try {
 		const response = await NotificationnModel.createNotification({
 			nameClient,
 			userId,
-			userAssignated,
+			assignTo,
 		});
 
 		if (response?.error) {
@@ -24,14 +24,14 @@ export const createNotification = async (req, res) => {
 };
 
 export const updateDataNotification = async (req, res) => {
-	const { userAssignated, nameClient } = req.body;
+	const { assignTo, nameClient } = req.body;
 	const { id } = req.query;
 	const userId = req.usuario.id;
 
 	try {
 		const response = await NotificationnModel.updateDataNotification({
 			id,
-			userAssignated,
+			assignTo,
 			nameClient,
 			userId,
 		});

@@ -6,7 +6,7 @@ const NotificationSchema = new mongoose.Schema({
 		required: [true, "Nombre del cliente obligatorio"],
 		trim: true,
 	},
-	userAssignated: {
+	assignTo: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "modeluser",
 	},
