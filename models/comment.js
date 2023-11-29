@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { urlApi } from "../db/config.js";
 import comments from "../schemas/comment.js";
+import issues from "../schemas/issue.js";
 
 export class CommentModel {
 	static async getComments({ idIssue = null }) {
@@ -55,7 +56,7 @@ export class CommentModel {
 	static async createComment({
 		description,
 		idIssue,
-		userAssignated,
+		assignTo,
 		status,
 		fileName = null,
 		userId,
@@ -67,10 +68,16 @@ export class CommentModel {
 				description,
 				userId,
 				idIssue,
-				userAssignated,
+				assignTo,
 				status,
 				fileName,
 			});
+
+			const updated = await issues.findByIdAndUpdate(
+				{ _id: idIssue },
+				{ status, assignTo },
+			);
+			console.log(updated);
 
 			await newComment.save();
 			await mongoose.disconnect();
@@ -86,7 +93,7 @@ export class CommentModel {
 		id,
 		description,
 		idIssue,
-		userAssignated,
+		assignTo,
 		status,
 		fileName,
 		userId,
@@ -107,7 +114,7 @@ export class CommentModel {
 				description,
 				userId,
 				idIssue,
-				userAssignated,
+				assignTo,
 				status,
 				fileName,
 			});

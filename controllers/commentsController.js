@@ -12,7 +12,7 @@ export const getComments = async (req, res) => {
 };
 
 export const createComment = async (req, res) => {
-	const { description, idIssue, userAssignated, status, fileName } = req.body;
+	const { description, idIssue, assignTo, status, fileName } = req.body;
 
 	const userId = req.usuario.id;
 
@@ -20,7 +20,7 @@ export const createComment = async (req, res) => {
 		const response = await CommentModel.createComment({
 			description,
 			idIssue,
-			userAssignated,
+			assignTo,
 			status,
 			fileName,
 			userId,
@@ -40,7 +40,7 @@ export const createComment = async (req, res) => {
 };
 
 export const updateComment = async (req, res) => {
-	const { description, idIssue, userAssignated, status, fileName } = req.body;
+	const { description, idIssue, assignTo, status, fileName } = req.body;
 	const { id } = req.query;
 	const userId = req.usuario.id;
 
@@ -49,7 +49,7 @@ export const updateComment = async (req, res) => {
 			id,
 			description,
 			idIssue,
-			userAssignated,
+			assignTo,
 			status,
 			fileName,
 			userId,
