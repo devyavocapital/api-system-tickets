@@ -8,20 +8,22 @@ export class IssuesModel {
 			await mongoose.connect(urlApi);
 
 			if (id !== "null") {
-				const issuesList = await issue.findById(id);
+				const issuesList = await issue.findById(id).sort({ created_At: -1 });
 				await mongoose.disconnect();
 				return issuesList;
 			}
 
 			if (id === "null" && nameClient !== "null") {
-				const issuesList = await issue.find({
-					nameClient: { $regex: nameClient },
-				});
+				const issuesList = await issue
+					.find({
+						nameClient: { $regex: nameClient },
+					})
+					.sort({ created_At: -1 });
 				await mongoose.disconnect();
 				return issuesList;
 			}
 
-			const issuesList = await issue.find();
+			const issuesList = await issue.find().sort({ created_At: -1 });
 			await mongoose.disconnect();
 
 			return issuesList;

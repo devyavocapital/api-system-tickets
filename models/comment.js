@@ -38,6 +38,11 @@ export class CommentModel {
 							"user.lastname": 1,
 						},
 					},
+					{
+						$sort: {
+							created_At: -1,
+						},
+					},
 				]);
 				await mongoose.disconnect();
 				return commentsList;
@@ -62,11 +67,7 @@ export class CommentModel {
 	}) {
 		try {
 			await mongoose.connect(urlApi);
-			console.log({
-				idIssue,
-				assignTo,
-				status,
-			});
+
 			const newComment = comments({
 				description,
 				userId,
