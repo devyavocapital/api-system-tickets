@@ -1,21 +1,69 @@
-const { fnSequelize } = require("../db/config");
+import { CommentModel } from "../models/comment.js";
 
-exports.createComment = async (req, res) => {
-	let id;
-	const { description, id_issue, userAssignated, status } = req.body;
-
-	if (req.body.id === undefined) id = "null";
-	if (req.body.id !== undefined) id = req.body.id;
+export const getComments = async (req, res) => {
+	const { idIssue } = req.query;
 
 	try {
-		const sequelize = fnSequelize();
-		const issue = await sequelize.query(
-			`EXEC SP_COMMENTS ${id}, '${description}', ${req.usuario.id}, ${id_issue}, ${userAssignated}, '${status}'`,
-		);
-		sequelize.close();
-		res.json({ issue });
+		const response = await CommentModel.getComments({ idIssue });
+		return res.json(response);
 	} catch (error) {
 		console.log(error);
-		return res.json({ error: "Hubo un error" });
+	}
+};
+
+export const createComment = async (req, res) => {
+	const { description, idIssue, userAssignated, status, fileName } = req.body;
+
+	const userId = req.usuario.id;
+
+	try {
+		const response = await CommentModel.createComment({
+			description,
+			idIssue,
+			userAssignated,
+			status,
+			fileName,
+			userId,
+		});
+
+		if (response?.error) {
+			if (response.error?.errors) {
+				return res.status(400).json(response.error.errors);
+			}
+			return res.status(400).json(response);
+		}
+
+		return res.status(response.status).json(response);
+	} catch (error) {
+		console.log(error);
+	}
+};
+
+export const updateComment = async (req, res) => {
+	const { description, idIssue, userAssignated, status, fileName } = req.body;
+	const { id } = req.query;
+	const userId = req.usuario.id;
+
+	try {
+		const response = await CommentModel.updateComment({
+			id,
+			description,
+			idIssue,
+			userAssignated,
+			status,
+			fileName,
+			userId,
+		});
+
+		if (response?.error) {
+			if (response.error?.errors) {
+				return res.status(400).json(response.error.errors);
+			}
+			return res.status(400).json(response);
+		}
+
+		return res.status(response.status).json(response);
+	} catch (error) {
+		console.log(error);
 	}
 };

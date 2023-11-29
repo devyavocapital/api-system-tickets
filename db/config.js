@@ -1,27 +1,8 @@
-const { Sequelize } = require("sequelize");
+const url = process.env.YAVO_SYSTEM_URL_MONGODB_URL;
+const user = process.env.YAVO_SYSTEM_URL_MONGODB_USER;
+const pass = process.env.YAVO_SYSTEM_URL_MONGODB_PASSWORD;
+const cluster = process.env.YAVO_SYSTEM_URL_MONGODB_CLUSTER;
+const endString = process.env.YAVO_SYSTEM_URL_MONGODB_END;
+const databaseName = process.env.YAVO_SYSTEM_URL_MONGODB_DATABASE;
 
-dbConfig = {
-	dataBaseName: process.env.NAME_DATABASE,
-	userDatabase: process.env.USER_DATABASE,
-	passDatabase: process.env.PASS_DATABASE,
-	hostDatabase: process.env.HOST_DATABASE,
-	typeDatabase: process.env.TYPE_DATABASE,
-};
-
-exports.fnSequelize = () => {
-	const sequelize = new Sequelize(
-		dbConfig.dataBaseName,
-		dbConfig.userDatabase,
-		dbConfig.passDatabase,
-		{
-			host: dbConfig.hostDatabase,
-			dialect: dbConfig.typeDatabase,
-			/* one of 'mysql' | 'postgres' | 'sqlite' | 'mariadb' | 'mssql' | 'db2' | 'snowflake' | 'oracle' */
-			dialectOptions: {
-				multipleStatements: true,
-			},
-		},
-	);
-
-	return sequelize;
-};
+export const urlApi = `${url}${user}:${pass}@${cluster}.${endString}/${databaseName}`;

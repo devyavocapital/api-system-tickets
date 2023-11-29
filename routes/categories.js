@@ -1,10 +1,12 @@
-const express = require("express");
-const router = express.Router();
-const categoriesController = require("../controllers/categoriesController");
-const auth = require("../middleware/auth");
+import { Router } from "express";
+import {
+	createCategory,
+	getCategories,
+	updateCategory,
+} from "../controllers/categoriesController.js";
+import { auth } from "../middleware/auth.js";
+export const categoryRouter = Router();
 
-router.get("/", auth, categoriesController.getCategories);
-router.post("/", auth, categoriesController.createCategory);
-router.put("/", auth, categoriesController.updateCategory);
-
-module.exports = router;
+categoryRouter.get("/", auth, getCategories);
+categoryRouter.post("/", auth, createCategory);
+categoryRouter.put("/", auth, updateCategory);

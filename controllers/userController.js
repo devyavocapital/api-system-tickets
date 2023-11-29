@@ -1,54 +1,27 @@
-const bcrypt = require("bcrypt");
-const { fnSequelize } = require("../db/config");
+import { UserModel } from "../models/user.js";
 
-exports.createUser = async (req, res) => {
-	const { email, password, category, nombre, ap_paterno, ap_materno } =
+export const createUser = async (req, res) => {
+	const { email, password, category, name, lastname, motherLastname } =
 		req.body;
-
-	if (email === "" || email === undefined) {
-		return res.json({ error: "El campo email es obligatorio" });
-	}
-
-	if (password === "" || password === undefined) {
-		return res.json({ error: "El campo password es obligatorio" });
-	}
-
 	try {
-		const sequelize = fnSequelize();
-		// hashear password
-		const salt = await bcrypt.genSalt(10);
-		const newPass = await bcrypt.hash(password, salt);
+		const response = await UserModel.createUser({
+			email,
+			password,
+			category,
+			name,
+			lastname,
+			motherLastname,
+		});
 
-		await sequelize.query(
-			`EXEC SP_NEW_USER '${email}', '${newPass}', ${category}, ${nombre}, ${ap_paterno}, ${ap_materno}`,
-		);
-		sequelize.close();
+		if (response?.error) {
+			if (response.error?.errors) {
+				return res.status(400).json(response.error.errors);
+			}
+			return res.status(400).json(response);
+		}
 
-		res.json({ msg: "Usuario creado correctamente" });
+		return res.status(response?.status).json(response);
 	} catch (error) {
-		console.log(error);
-		const errorLog = `${error.original}`;
-		res.json({ error: errorLog });
+		return res.status(400).json(error);
 	}
-
-	// const payload = {
-	// 	user: {
-	// 		id: user.id,
-	// 		email: user.email,
-	// 		name: user.name,
-	// 	},
-	// };
-
-	// jwt.sign(
-	// 	payload,
-	// 	process.env.JAVOSECRETWORDS,
-	// 	{
-	// 		expiresIn: "30D",
-	// 	},
-	// 	({ error }) => {
-	// 		if (error) throw error;
-
-	// 		res.json({ msg: "Usuario creado correctamente" });
-	// 	},
-	// );
 };

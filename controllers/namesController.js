@@ -1,13 +1,10 @@
-const { fnSequelize } = require("../db/config");
+import { NameModel } from "../models/name.js";
 
-exports.getNames = async (req, res) => {
+export const getNames = async (req, res) => {
 	try {
-		const sequelize = fnSequelize();
-		const names = await sequelize.query("EXEC SP_LST_NAMES");
-		sequelize.close();
-		res.json({ names });
+		const response = await NameModel.getNames();
+		return res.json(response);
 	} catch (error) {
 		console.log(error);
-		return res.json({ error: "Hubo un error" });
 	}
 };

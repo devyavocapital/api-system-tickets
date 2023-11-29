@@ -1,65 +1,38 @@
-const { fnSequelize } = require("../db/config");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+import jwt from "jsonwebtoken";
+import { Login } from "../models/login.js";
 
-exports.authUser = async (req, res) => {
+export const authUser = async (req, res) => {
 	const { email, password } = req.body;
 
-	if (email === "" || email === undefined) {
-		return res.json({ error: "Error: El campo email es obligatorio" });
-	}
-
-	if (password === "" || password === undefined) {
-		return res.json({ error: "Error: El campo password es obligatorio" });
-	}
-
 	try {
-		const sequelize = fnSequelize();
-		const response = await sequelize.query(`EXEC SP_LOGIN NULL, '${email}'`);
-		sequelize.close();
+		const payload = await Login.getLogin({ email, password });
 
-		const user = response[0];
-		//Comparar los passwords
-		const passwordCorrect = await bcrypt.compare(password, user[0].password);
-		if (!passwordCorrect) {
-			return res.json({ error: "Error: El password es incorrecto" });
+		if (payload?.error) {
+			return res.json(payload);
 		}
-		//firmar jwt
-		const payload = {
-			usuario: {
-				id: user[0].id,
-			},
-		};
 
 		jwt.sign(
 			payload,
-			process.env.JAVOSECRETWORDS,
+			process.env.SECRETTRACKSWORDS,
 			{
 				expiresIn: "30D",
 			},
 			(error, token) => {
 				if (error) throw error;
-
 				return res.json({ token });
 			},
 		);
 	} catch (error) {
-		// console.error();
-		const errorLog = `${error.original}`;
-		res.json({ error: errorLog });
+		console.log(error);
 	}
 };
 
-exports.userAuthenticate = async (req, res) => {
+export const userAuthenticate = async (req, res) => {
+	const id = req.usuario.id;
 	try {
-		const sequelize = fnSequelize();
-		const usuario = await sequelize.query(
-			`EXEC SP_LOGIN ${req.usuario.id}, NULL`,
-		);
-		sequelize.close();
-		res.json({ usuario });
+		const response = await Login.getUserAuthenticated({ id });
+		return res.json({ user: response });
 	} catch (error) {
 		console.log(error);
-		return res.json({ error: "Hubo un error" });
 	}
 };

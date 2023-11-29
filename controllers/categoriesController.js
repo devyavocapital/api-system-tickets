@@ -1,57 +1,50 @@
-const { fnSequelize } = require("../db/config");
+import { CategoryModel } from "../models/category.js";
 
-exports.createCategory = async (req, res) => {
+export const createCategory = async (req, res) => {
 	const { nameCategory } = req.body;
-
-	const id = "null";
+	const userId = req.usuario.id;
 
 	try {
-		const sequelize = fnSequelize();
-		await sequelize.query(
-			`EXEC SP_CATEGORIES_ISSUES ${id}, '${nameCategory}', ${req.usuario.id}`,
-		);
-		sequelize.close();
-		res.json({ msg: "Categoría agregada." });
+		const response = await CategoryModel.createCategory({
+			nameCategory,
+			userId,
+		});
+
+		if (response?.error) {
+			if (response.error?.errors) {
+				return res.status(400).json(response.error.errors);
+			}
+			return res.status(400).json(response);
+		}
+
+		return res.status(response.status).json(response);
 	} catch (error) {
 		console.log(error);
-		return res.json({ error: "Hubo un error" });
 	}
 };
 
-exports.getCategories = async (req, res) => {
-	let id;
-	if (req.query.id === undefined) id = "null";
-	if (req.query.id !== undefined) id = req.query.id;
-
+export const getCategories = async (req, res) => {
 	try {
-		const sequelize = fnSequelize();
-		const categories = await sequelize.query(
-			`EXEC SP_LST_CATEGORY_ISSUES ${id}`,
-		);
-		sequelize.close();
-		res.json({ categories });
+		const response = await CategoryModel.getCategories();
+		return res.status(200).json(response);
 	} catch (error) {
 		console.log(error);
-		return res.json({ error: "Hubo un error" });
 	}
 };
 
-exports.updateCategory = async (req, res) => {
-	let id;
+export const updateCategory = async (req, res) => {
 	const { nameCategory } = req.body;
-
-	if (req.query.id === undefined) id = "null";
-	if (req.query.id !== undefined) id = req.query.id;
+	const { id } = req.query;
+	const userId = req.usuario.id;
 
 	try {
-		const sequelize = fnSequelize();
-		await sequelize.query(
-			`EXEC SP_LST_CATEGORY_ISSUES ${id}, '${nameCategory}', ${req.usuario.id}`,
-		);
-		sequelize.close();
-		res.json({ msg: "Categoría actualizada." });
+		const response = await CategoryModel.updateCategory({
+			id,
+			nameCategory,
+			userId,
+		});
+		return res.status(response.status).json(response);
 	} catch (error) {
 		console.log(error);
-		return res.json({ error: "Hubo un error" });
 	}
 };
