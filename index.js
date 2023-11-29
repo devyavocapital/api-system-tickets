@@ -22,7 +22,7 @@ const PORT = process.env.PORT || 4000;
 
 const socketIO = new Server(http, {
 	cors: {
-		origin: "http://localhost:5173",
+		origin: "*",
 	},
 });
 
