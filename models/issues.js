@@ -18,7 +18,7 @@ export class IssuesModel {
 					.find({
 						nameClient: { $regex: nameClient },
 					})
-					.sort({ created_At: -1 });
+					.sort({ created_At: -1, status: 1, nameClient: 1 });
 				await mongoose.disconnect();
 				return issuesList;
 			}
