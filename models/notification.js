@@ -3,14 +3,14 @@ import { urlApi } from "../db/config.js";
 import notifications from "../schemas/notification.js";
 
 export class NotificationnModel {
-	static async createNotification({ nameClient, userId, userAssignated }) {
+	static async createNotification({ nameClient, userId, assignTo }) {
 		try {
 			await mongoose.connect(urlApi);
 
 			const newNotification = notifications({
 				nameClient,
 				userId,
-				userAssignated,
+				assignTo,
 			});
 
 			await newNotification.save();
@@ -23,12 +23,7 @@ export class NotificationnModel {
 		}
 	}
 
-	static async updateDataNotification({
-		id,
-		userAssignated,
-		nameClient,
-		userId,
-	}) {
+	static async updateDataNotification({ id, assignTo, nameClient, userId }) {
 		try {
 			await mongoose.connect(urlApi);
 
@@ -41,7 +36,7 @@ export class NotificationnModel {
 			}
 
 			const newNotification = await notifications.findByIdAndUpdate(id, {
-				userAssignated,
+				assignTo,
 				nameClient,
 				userId,
 			});

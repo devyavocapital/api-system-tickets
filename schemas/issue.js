@@ -30,9 +30,13 @@ const IssueSchema = new mongoose.Schema({
 		type: String,
 		trim: true,
 	},
-	assingTo: {
+	assignTo: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "modeluser",
+	},
+	nameAssignated: {
+		type: String,
+		trim: true,
 	},
 	status: {
 		type: String,

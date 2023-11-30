@@ -11,9 +11,13 @@ const CommentSchema = new mongoose.Schema({
 		ref: "modelissue",
 		required: [true, "El id de incidencia es necesario."],
 	},
-	userAssignated: {
+	assignTo: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "modeluser",
+	},
+	nameAssignated: {
+		type: String,
+		trim: true,
 	},
 	status: {
 		type: String,

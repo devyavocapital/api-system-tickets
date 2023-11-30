@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { urlApi } from "../db/config.js";
 import comments from "../schemas/comment.js";
+import issues from "../schemas/issue.js";
 
 export class CommentModel {
 	static async getComments({ idIssue = null }) {
@@ -8,7 +9,6 @@ export class CommentModel {
 			await mongoose.connect(urlApi);
 
 			if (idIssue !== null) {
-				console.log("getting comments");
 				const commentsList = await comments.aggregate([
 					{
 						$match: {
@@ -38,6 +38,11 @@ export class CommentModel {
 							"user.lastname": 1,
 						},
 					},
+					{
+						$sort: {
+							created_At: -1,
+						},
+					},
 				]);
 				await mongoose.disconnect();
 				return commentsList;
@@ -55,7 +60,8 @@ export class CommentModel {
 	static async createComment({
 		description,
 		idIssue,
-		userAssignated,
+		assignTo,
+		nameAssignated,
 		status,
 		fileName = null,
 		userId,
@@ -67,10 +73,25 @@ export class CommentModel {
 				description,
 				userId,
 				idIssue,
-				userAssignated,
+				assignTo,
+				nameAssignated,
 				status,
 				fileName,
 			});
+
+			if (assignTo) {
+				const updated = await issues.findByIdAndUpdate(
+					{ _id: idIssue },
+					{ status, assignTo, nameAssignated },
+				);
+			}
+
+			if (!assignTo) {
+				const updated = await issues.findByIdAndUpdate(
+					{ _id: idIssue },
+					{ status },
+				);
+			}
 
 			await newComment.save();
 			await mongoose.disconnect();
@@ -86,7 +107,7 @@ export class CommentModel {
 		id,
 		description,
 		idIssue,
-		userAssignated,
+		assignTo,
 		status,
 		fileName,
 		userId,
@@ -107,7 +128,7 @@ export class CommentModel {
 				description,
 				userId,
 				idIssue,
-				userAssignated,
+				assignTo,
 				status,
 				fileName,
 			});
