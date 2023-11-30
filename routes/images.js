@@ -24,6 +24,7 @@ routerImages.get("/uploads/:img", function (req, res) {
 	console.log(dir);
 	const img = req.params.img;
 	const pFinal = dir.replace("routes\\", "");
+	console.log(`${pFinal}/${img}`);
 	res.sendFile(`${pFinal}/${img}`);
 });
 

@@ -15,6 +15,10 @@ const CommentSchema = new mongoose.Schema({
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "modeluser",
 	},
+	nameAssignated: {
+		type: String,
+		trim: true,
+	},
 	status: {
 		type: String,
 		required: [true, "El status es obligatorio."],

@@ -61,6 +61,7 @@ export class CommentModel {
 		description,
 		idIssue,
 		assignTo,
+		nameAssignated,
 		status,
 		fileName = null,
 		userId,
@@ -73,15 +74,24 @@ export class CommentModel {
 				userId,
 				idIssue,
 				assignTo,
+				nameAssignated,
 				status,
 				fileName,
 			});
 
-			const updated = await issues.findByIdAndUpdate(
-				{ _id: idIssue },
-				{ status, assignTo },
-			);
-			console.log(updated);
+			if (assignTo) {
+				const updated = await issues.findByIdAndUpdate(
+					{ _id: idIssue },
+					{ status, assignTo, nameAssignated },
+				);
+			}
+
+			if (!assignTo) {
+				const updated = await issues.findByIdAndUpdate(
+					{ _id: idIssue },
+					{ status },
+				);
+			}
 
 			await newComment.save();
 			await mongoose.disconnect();
