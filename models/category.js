@@ -11,8 +11,6 @@ export class CategoryModel {
     } catch (error) {
       console.log(error)
       return { error: 'Hubo un error' }
-    } finally {
-      mongoose.disconnect()
     }
   }
 
@@ -39,8 +37,6 @@ export class CategoryModel {
     } catch (error) {
       console.log({ errorMongo: error })
       return { error }
-    } finally {
-      mongoose.disconnect()
     }
   }
 
@@ -65,8 +61,6 @@ export class CategoryModel {
     } catch (error) {
       console.log(error)
       return { error }
-    } finally {
-      mongoose.disconnect()
     }
   }
 }

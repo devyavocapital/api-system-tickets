@@ -11,28 +11,26 @@ export class IssuesModel {
 
       if (id !== 'null') {
         const issuesList = await issue.findById(id).sort({ created_At: -1 })
-        await mongoose.disconnect()
+
         return issuesList
       }
 
       if (id === 'null' && nameClient !== 'null') {
         const issuesList = await issue
           .find({
-            nameClient: { $regex: nameClient }
+            taks: { $regex: nameClient }
           })
           .sort({ created_At: -1, status: 1, nameClient: 1 })
-        await mongoose.disconnect()
+
         return issuesList
       }
 
       const issuesList = await issue.find().sort({ created_At: -1 })
-
+      console.log(issuesList)
       return issuesList
     } catch (error) {
       console.log(error)
       return { error: 'Hubo un error' }
-    } finally {
-      mongoose.disconnect()
     }
   }
 
@@ -87,8 +85,6 @@ export class IssuesModel {
       return { msg: 'Incidencia creada correctamente', issueAdded }
     } catch (error) {
       return { error }
-    } finally {
-      mongoose.disconnect()
     }
   }
 
@@ -147,8 +143,6 @@ export class IssuesModel {
     } catch (error) {
       console.log(error)
       return { error }
-    } finally {
-      mongoose.disconnect()
     }
   }
 }
