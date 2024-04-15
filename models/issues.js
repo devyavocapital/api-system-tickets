@@ -79,7 +79,8 @@ export class IssuesModel {
         getEmailTest({
           toEmail: userAssignated.email,
           subject: `Ticket Asignado - ${task}`,
-          task
+          task,
+          daysConfig
         })
       }
 
@@ -137,7 +138,8 @@ export class IssuesModel {
         getEmailTest({
           toEmail: userAssignated.email,
           subject: `Ticket Asignado - ${task}`,
-          task
+          task,
+          daysConfig
         })
       }
 

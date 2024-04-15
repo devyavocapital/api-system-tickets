@@ -25,7 +25,7 @@ export class NotificationnModel {
     }
   }
 
-  static async updateDataNotification ({ id, assignTo, nameClient, userId }) {
+  static async updateDataNotification ({ id, assignTo, nameClient, userId, task }) {
     try {
       await mongoose.connect(urlApi)
 
@@ -38,6 +38,7 @@ export class NotificationnModel {
       }
 
       const newNotification = await notifications.findByIdAndUpdate(id, {
+        task,
         assignTo,
         nameClient,
         userId
@@ -55,7 +56,6 @@ export class NotificationnModel {
     try {
       await mongoose.connect(urlApi)
       const notificationsList = await notifications.find({ assignTo: userId })
-      console.log({ notificationsList, userId })
 
       return notificationsList
     } catch (error) {
