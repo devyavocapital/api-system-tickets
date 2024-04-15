@@ -22,8 +22,8 @@ const PORT = process.env.PORT || 4000
 
 const socketIO = new Server(http, {
   cors: {
-    origin: '*',
-  },
+    origin: '*'
+  }
 })
 
 app.use(cors())

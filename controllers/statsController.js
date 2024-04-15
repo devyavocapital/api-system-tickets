@@ -1,7 +1,7 @@
-import { StatsModel } from "../models/stats.js";
+import { StatsModel } from '../models/stats.js'
 
 export const getStats = async (req, res) => {
-	const response = await StatsModel.getStats({ userId: req.usuario.id });
+  const response = await StatsModel.getStats({ userId: req.usuario.id })
 
-	return res.json(response);
-};
+  return res.json(response)
+}

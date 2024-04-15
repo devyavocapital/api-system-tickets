@@ -2,7 +2,7 @@ import { Router } from 'express'
 import {
   createIssue,
   getIssues,
-  updateIssue,
+  updateIssue
 } from '../controllers/issuesController.js'
 import { auth } from '../middleware/auth.js'
 export const issuesRouter = Router()
