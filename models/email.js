@@ -12,7 +12,7 @@ export const getEmailTest = async ({ toEmail, subject, task, daysConfig }) => {
     html: `
         <p>Se te asigno un ticket para darle seguimiento a 
             <strong>${task}</strong></p>
-        <p>Favor de tenerlo presente durante el tiempo indicado: Tienes ${daysConfig} para poder terminar esta tarea.</p>
+        <p>Favor de tenerlo presente durante el tiempo indicado: Tienes ${daysConfig} días para poder terminar esta tarea.</p>
         `
   })
 

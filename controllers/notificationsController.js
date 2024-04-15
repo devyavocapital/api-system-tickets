@@ -64,8 +64,7 @@ export const getNotifications = async (req, res) => {
 }
 
 export const patchNotification = async (req, res) => {
-  const { readed, active } = req.body
-  const { id } = req.query
+  const { readed, active, id } = req.body
 
   try {
     const response = await NotificationnModel.updateNotification({
