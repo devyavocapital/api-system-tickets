@@ -60,6 +60,30 @@ export const getIssues = async (req, res) => {
   }
 }
 
+export const updateIssueStatus = async (req, res) => {
+  const {
+    id,
+    status
+  } = req.body
+  console.log({ id, status })
+  try {
+    const response = await IssuesModel.updateIssueStatus({
+      id,
+      status
+    })
+    console.log(response)
+    if (response?.error) {
+      if (response.error?.errors) {
+        return res.status(400).json(response.error.errors)
+      }
+      return res.status(400).json(response)
+    }
+
+    return res.status(response.status).json(response)
+  } catch (error) {
+    console.log(error)
+  }
+}
 export const updateIssue = async (req, res) => {
   const {
     task,
