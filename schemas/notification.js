@@ -1,9 +1,13 @@
 import mongoose from 'mongoose'
 
 const NotificationSchema = new mongoose.Schema({
+  task: {
+    type: String,
+    required: [true, 'Nombre de la tarea'],
+    trim: true
+  },
   nameClient: {
     type: String,
-    required: [true, 'Nombre del cliente obligatorio'],
     trim: true
   },
   assignTo: {
@@ -28,8 +32,6 @@ const NotificationSchema = new mongoose.Schema({
   }
 })
 
-const notifications =
-	mongoose.models.modelnotification ||
-	mongoose.model('modelnotification', NotificationSchema)
+const notifications = mongoose.models.modelnotification || mongoose.model('modelnotification', NotificationSchema)
 
 export default notifications

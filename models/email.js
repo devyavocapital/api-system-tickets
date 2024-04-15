@@ -4,7 +4,7 @@ const resend = new Resend(process.env.YAVO_SYSTEM_RESEND_APIKEY)
 
 const emailSender = process.env.YAVO_SYSTEM_EMAIL_SENDER
 
-export const getEmailTest = async ({ toEmail, subject, task }) => {
+export const getEmailTest = async ({ toEmail, subject, task, daysConfig }) => {
   const { error } = await resend.emails.send({
     from: emailSender,
     to: [toEmail],
@@ -12,8 +12,8 @@ export const getEmailTest = async ({ toEmail, subject, task }) => {
     html: `
         <p>Se te asigno un ticket para darle seguimiento a 
             <strong>${task}</strong></p>
-            <br/>
-        <p>Favor de tenerlo presente durante el tiempo indicado</p>`
+        <p>Favor de tenerlo presente durante el tiempo indicado: Tienes ${daysConfig} para poder terminar esta tarea.</p>
+        `
   })
 
   if (error) {
