@@ -1,71 +1,71 @@
-import { CommentModel } from "../models/comment.js";
+import { CommentModel } from '../models/comment.js'
 
 export const getComments = async (req, res) => {
-	const { idIssue } = req.query;
+  const { idIssue } = req.query
 
-	try {
-		const response = await CommentModel.getComments({ idIssue });
-		return res.json(response);
-	} catch (error) {
-		console.log(error);
-	}
-};
+  try {
+    const response = await CommentModel.getComments({ idIssue })
+    return res.json(response)
+  } catch (error) {
+    console.log(error)
+  }
+}
 
 export const createComment = async (req, res) => {
-	const { description, idIssue, assignTo, nameAssignated, status, fileName } =
-		req.body;
+  const { description, idIssue, assignTo, nameAssignated, status, fileName } =
+		req.body
 
-	const userId = req.usuario.id;
+  const userId = req.usuario.id
 
-	try {
-		const response = await CommentModel.createComment({
-			description,
-			idIssue,
-			assignTo,
-			nameAssignated,
-			status,
-			fileName,
-			userId,
-		});
+  try {
+    const response = await CommentModel.createComment({
+      description,
+      idIssue,
+      assignTo,
+      nameAssignated,
+      status,
+      fileName,
+      userId
+    })
 
-		if (response?.error) {
-			if (response.error?.errors) {
-				return res.status(400).json(response.error.errors);
-			}
-			return res.status(400).json(response);
-		}
+    if (response?.error) {
+      if (response.error?.errors) {
+        return res.status(400).json(response.error.errors)
+      }
+      return res.status(400).json(response)
+    }
 
-		return res.status(response.status).json(response);
-	} catch (error) {
-		console.log(error);
-	}
-};
+    return res.status(response.status).json(response)
+  } catch (error) {
+    console.log(error)
+  }
+}
 
 export const updateComment = async (req, res) => {
-	const { description, idIssue, assignTo, status, fileName } = req.body;
-	const { id } = req.query;
-	const userId = req.usuario.id;
+  const { description, idIssue, assignTo, status, fileName } = req.body
+  const { id } = req.query
+  const userId = req.usuario.id
 
-	try {
-		const response = await CommentModel.updateComment({
-			id,
-			description,
-			idIssue,
-			assignTo,
-			status,
-			fileName,
-			userId,
-		});
+  try {
+    const response = await CommentModel.updateComment({
+      id,
+      description,
+      idIssue,
+      assignTo,
+      status,
+      fileName,
+      userId
+    })
 
-		if (response?.error) {
-			if (response.error?.errors) {
-				return res.status(400).json(response.error.errors);
-			}
-			return res.status(400).json(response);
-		}
+    if (response?.error) {
+      if (response.error?.errors) {
+        return res.status(400).json(response.error.errors)
+      }
+      return res.status(400).json(response)
+    }
 
-		return res.status(response.status).json(response);
-	} catch (error) {
-		console.log(error);
-	}
-};
+    return res.status(response.status).json(response)
+  } catch (error) {
+    console.log(error)
+  }
+}

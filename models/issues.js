@@ -5,7 +5,7 @@ import user from '../schemas/user.js'
 import { getEmailTest } from './email.js'
 
 export class IssuesModel {
-  static async getIssues({ id = 'null', nameClient = 'null' }) {
+  static async getIssues ({ id = 'null', nameClient = 'null' }) {
     try {
       await mongoose.connect(urlApi)
 
@@ -18,7 +18,7 @@ export class IssuesModel {
       if (id === 'null' && nameClient !== 'null') {
         const issuesList = await issue
           .find({
-            nameClient: { $regex: nameClient },
+            nameClient: { $regex: nameClient }
           })
           .sort({ created_At: -1, status: 1, nameClient: 1 })
         await mongoose.disconnect()
@@ -26,16 +26,18 @@ export class IssuesModel {
       }
 
       const issuesList = await issue.find().sort({ created_At: -1 })
-      await mongoose.disconnect()
 
       return issuesList
     } catch (error) {
       console.log(error)
       return { error: 'Hubo un error' }
+    } finally {
+      mongoose.disconnect()
     }
   }
 
-  static async createIssue({
+  static async createIssue ({
+    task,
     nameClient,
     lastnameClient = 'null',
     motherLastnameClient = 'null',
@@ -48,12 +50,13 @@ export class IssuesModel {
     status = 'pendient',
     category = 0,
     daysConfig,
-    userId,
+    userId
   }) {
     try {
       await mongoose.connect(urlApi)
 
       const newIssue = issue({
+        task,
         nameClient,
         lastnameClient,
         motherLastnameClient,
@@ -66,7 +69,7 @@ export class IssuesModel {
         status,
         category,
         daysConfig,
-        userId,
+        userId
       })
 
       const issueAdded = await newIssue.save()
@@ -75,21 +78,22 @@ export class IssuesModel {
         const userAssignated = await user.findById({ _id: assignTo })
         getEmailTest({
           toEmail: userAssignated.email,
-          subject: `Ticket Asignado - ${nameClient}`,
-          nameClient,
+          subject: `Ticket Asignado - ${task}`,
+          task
         })
       }
 
-      await mongoose.disconnect()
       return { msg: 'Incidencia creada correctamente', issueAdded }
     } catch (error) {
-      console.log(error)
       return { error }
+    } finally {
+      mongoose.disconnect()
     }
   }
 
-  static async updateIssue({
+  static async updateIssue ({
     id,
+    task,
     nameClient,
     lastnameClient = 'null',
     motherLastnameClient = 'null',
@@ -100,7 +104,7 @@ export class IssuesModel {
     nameAssignated,
     status = 'pendient',
     category = 0,
-    daysConfig,
+    daysConfig
   }) {
     try {
       await mongoose.connect(urlApi)
@@ -109,11 +113,12 @@ export class IssuesModel {
       if (!issueExist) {
         return {
           error: 'Error: No existe incidencia con este ID.',
-          status: 401,
+          status: 401
         }
       }
 
       await issue.findByIdAndUpdate(id, {
+        task,
         nameClient,
         lastnameClient,
         motherLastnameClient,
@@ -124,24 +129,24 @@ export class IssuesModel {
         nameAssignated,
         status,
         category: parseInt(category),
-        daysConfig: parseInt(daysConfig),
+        daysConfig: parseInt(daysConfig)
       })
 
       if (assignTo !== null || assignTo !== undefined) {
         const userAssignated = await user.findById({ _id: assignTo })
         getEmailTest({
           toEmail: userAssignated.email,
-          subject: `Ticket Asignado - ${nameClient}`,
-          nameClient,
+          subject: `Ticket Asignado - ${task}`,
+          task
         })
       }
-
-      await mongoose.disconnect()
 
       return { msg: 'Incidencia actualizada correctamente', status: 200 }
     } catch (error) {
       console.log(error)
       return { error }
+    } finally {
+      mongoose.disconnect()
     }
   }
 }

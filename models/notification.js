@@ -1,87 +1,94 @@
-import mongoose from "mongoose";
-import { urlApi } from "../db/config.js";
-import notifications from "../schemas/notification.js";
+import mongoose from 'mongoose'
+import { urlApi } from '../db/config.js'
+import notifications from '../schemas/notification.js'
 
 export class NotificationnModel {
-	static async createNotification({ nameClient, userId, assignTo }) {
-		try {
-			await mongoose.connect(urlApi);
+  static async createNotification ({ task, nameClient, userId, assignTo }) {
+    try {
+      await mongoose.connect(urlApi)
 
-			const newNotification = notifications({
-				nameClient,
-				userId,
-				assignTo,
-			});
+      const newNotification = notifications({
+        task,
+        nameClient,
+        userId,
+        assignTo
+      })
 
-			await newNotification.save();
+      await newNotification.save()
 
-			await mongoose.disconnect();
-			return { msg: "Notificación agregada.", status: 200 };
-		} catch (error) {
-			console.log(error);
-			return { error };
-		}
-	}
+      return { msg: 'Notificación agregada.', status: 200 }
+    } catch (error) {
+      console.log(error)
+      return { error }
+    } finally {
+      mongoose.disconnect()
+    }
+  }
 
-	static async updateDataNotification({ id, assignTo, nameClient, userId }) {
-		try {
-			await mongoose.connect(urlApi);
+  static async updateDataNotification ({ id, assignTo, nameClient, userId }) {
+    try {
+      await mongoose.connect(urlApi)
 
-			const notExist = await notifications.findById(id);
-			if (!notExist) {
-				return {
-					error: "Error: No existe ninguna notificación con este ID",
-					status: 401,
-				};
-			}
+      const notExist = await notifications.findById(id)
+      if (!notExist) {
+        return {
+          error: 'Error: No existe ninguna notificación con este ID',
+          status: 401
+        }
+      }
 
-			const newNotification = await notifications.findByIdAndUpdate(id, {
-				assignTo,
-				nameClient,
-				userId,
-			});
+      const newNotification = await notifications.findByIdAndUpdate(id, {
+        assignTo,
+        nameClient,
+        userId
+      })
 
-			await mongoose.disconnect();
-			return { msg: "Notificación Actualizada.", status: 200, newNotification };
-		} catch (error) {
-			return { error };
-		}
-	}
+      return { msg: 'Notificación Actualizada.', status: 200, newNotification }
+    } catch (error) {
+      return { error }
+    } finally {
+      mongoose.disconnect()
+    }
+  }
 
-	static async getNotifications({ userId }) {
-		try {
-			await mongoose.connect(urlApi);
-			const notificationsList = await notifications.find({ userId });
-			await mongoose.disconnect();
-			return notificationsList;
-		} catch (error) {
-			console.log(error);
-			return { error };
-		}
-	}
+  static async getNotifications ({ userId }) {
+    try {
+      await mongoose.connect(urlApi)
+      const notificationsList = await notifications.find({ assignTo: userId })
+      console.log({ notificationsList, userId })
 
-	static async updateNotification({ id, readed, active }) {
-		try {
-			await mongoose.connect(urlApi);
+      return notificationsList
+    } catch (error) {
+      console.log(error)
+      return { error }
+    } finally {
+      mongoose.disconnect()
+    }
+  }
 
-			const notExist = await notifications.findById(id);
-			if (!notExist) {
-				return {
-					error: { Error: "Ya no existe esta notificación" },
-					status: 401,
-				};
-			}
+  static async updateNotification ({ id, readed, active }) {
+    try {
+      await mongoose.connect(urlApi)
 
-			await notifications.findByIdAndUpdate(id, {
-				readed,
-				active,
-			});
+      const notExist = await notifications.findById(id)
+      if (!notExist) {
+        return {
+          error: { Error: 'Ya no existe esta notificación' },
+          status: 401
+        }
+      }
 
-			await mongoose.disconnect();
-			return { msg: "Notificación actualizada.", status: 200 };
-		} catch (error) {
-			console.log(error);
-			return { error: "Hubo un error" };
-		}
-	}
+      await notifications.findByIdAndUpdate(id, {
+        readed,
+        active
+      })
+
+      return { msg: 'Notificación actualizada.', status: 200 }
+    } catch (error) {
+      console.log(error)
+      return { error: 'Hubo un error' }
+    } finally {
+      mongoose.disconnect()
+    }
+  }
 }
