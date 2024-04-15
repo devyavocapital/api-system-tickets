@@ -26,7 +26,7 @@ export class IssuesModel {
       }
 
       const issuesList = await issue.find().sort({ created_At: -1 })
-      console.log(issuesList)
+
       return issuesList
     } catch (error) {
       console.log(error)
@@ -138,6 +138,32 @@ export class IssuesModel {
           daysConfig
         })
       }
+
+      return { msg: 'Incidencia actualizada correctamente', status: 200 }
+    } catch (error) {
+      console.log(error)
+      return { error }
+    }
+  }
+
+  static async updateIssueStatus ({
+    id,
+    status
+  }) {
+    try {
+      await mongoose.connect(urlApi)
+
+      const issueExist = await issue.findById(id)
+      if (!issueExist) {
+        return {
+          error: 'Error: No existe incidencia con este ID.',
+          status: 401
+        }
+      }
+
+      await issue.findByIdAndUpdate(id, {
+        status
+      })
 
       return { msg: 'Incidencia actualizada correctamente', status: 200 }
     } catch (error) {

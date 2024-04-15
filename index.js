@@ -32,9 +32,9 @@ app.use(express.json())
 let users = []
 
 socketIO.on('connection', (socket) => {
-  console.log(`⚡: ${socket.id} user just connected!`)
+  // console.log(`⚡: ${socket.id} user just connected!`)
   socket.on('notification', (data) => {
-    console.log({ dataNotification: data })
+    // console.log({ dataNotification: data })
     socketIO.emit('notificationResponse', data)
   })
 
@@ -44,7 +44,7 @@ socketIO.on('connection', (socket) => {
   })
 
   socket.on('disconnect', () => {
-    console.log('🔥: A user disconnected')
+    // console.log('🔥: A user disconnected')
     users = users.filter((user) => user.socketID !== socket.id)
     socketIO.emit('newUserResponse', users)
     socket.disconnect()
