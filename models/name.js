@@ -13,8 +13,6 @@ export class NameModel {
     } catch (error) {
       console.log(error)
       return { error: 'Hubo un error', errorStack: error }
-    } finally {
-      await mongoose.disconnect()
     }
   }
 }

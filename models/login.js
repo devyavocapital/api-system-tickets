@@ -35,8 +35,6 @@ export class Login {
     } catch (error) {
       console.log(error)
       return { error }
-    } finally {
-      mongoose.disconnect()
     }
   }
 
@@ -51,8 +49,6 @@ export class Login {
     } catch (error) {
       console.log(error)
       return { error: 'Hubo un error' }
-    } finally {
-      mongoose.disconnect()
     }
   }
 }

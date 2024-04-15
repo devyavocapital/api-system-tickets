@@ -40,10 +40,7 @@ export class UserModel {
 
       return { msg: 'Usuario creado correctamente', status: 201 }
     } catch (error) {
-      console.log({ errorMongo: error })
       return { error }
-    } finally {
-      mongoose.disconnect()
     }
   }
 }

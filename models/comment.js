@@ -49,8 +49,6 @@ export class CommentModel {
     } catch (error) {
       console.log(error)
       return { error: 'Hubo un error' }
-    } finally {
-      mongoose.disconnect()
     }
   }
 
@@ -77,14 +75,14 @@ export class CommentModel {
       })
 
       if (assignTo) {
-        const updated = await issues.findByIdAndUpdate(
+        await issues.findByIdAndUpdate(
           { _id: idIssue },
           { status, assignTo, nameAssignated }
         )
       }
 
       if (!assignTo) {
-        const updated = await issues.findByIdAndUpdate(
+        await issues.findByIdAndUpdate(
           { _id: idIssue },
           { status }
         )
@@ -96,8 +94,6 @@ export class CommentModel {
     } catch (error) {
       console.log({ errorMongo: error })
       return { error }
-    } finally {
-      mongoose.disconnect()
     }
   }
 
@@ -135,8 +131,6 @@ export class CommentModel {
     } catch (error) {
       console.log({ errorMongo: error })
       return { error }
-    } finally {
-      mongoose.disconnect()
     }
   }
 }

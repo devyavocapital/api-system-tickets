@@ -20,8 +20,6 @@ export class NotificationnModel {
     } catch (error) {
       console.log(error)
       return { error }
-    } finally {
-      mongoose.disconnect()
     }
   }
 
@@ -47,8 +45,6 @@ export class NotificationnModel {
       return { msg: 'Notificación Actualizada.', status: 200, newNotification }
     } catch (error) {
       return { error }
-    } finally {
-      mongoose.disconnect()
     }
   }
 
@@ -61,8 +57,6 @@ export class NotificationnModel {
     } catch (error) {
       console.log(error)
       return { error }
-    } finally {
-      mongoose.disconnect()
     }
   }
 
@@ -87,8 +81,6 @@ export class NotificationnModel {
     } catch (error) {
       console.log(error)
       return { error: 'Hubo un error' }
-    } finally {
-      mongoose.disconnect()
     }
   }
 }
