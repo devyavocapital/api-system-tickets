@@ -2,6 +2,7 @@ import mongoose from 'mongoose'
 import { urlApi } from '../db/config.js'
 import issue from '../schemas/issue.js'
 import user from '../schemas/user.js'
+import { formatName } from '../utils/formatName.js'
 import { getEmailTest } from './email.js'
 
 export class IssuesModel {
@@ -53,6 +54,16 @@ export class IssuesModel {
     try {
       await mongoose.connect(urlApi)
 
+      let userName = {
+        name: '',
+        lastname: ''
+      }
+
+      if (assignTo === undefined) {
+        const userNameResponse = await user.findById({ _id: userId }).select(['name', 'lastname'])
+        userName = { name: userNameResponse.name, lastname: userNameResponse.lastname }
+      }
+
       const newIssue = issue({
         task,
         nameClient,
@@ -62,8 +73,8 @@ export class IssuesModel {
         socialNumber,
         cardNumber,
         initialComment,
-        assignTo,
-        nameAssignated,
+        assignTo: assignTo !== undefined ? assignTo : userId,
+        nameAssignated: assignTo !== undefined ? nameAssignated : formatName({ name: userName.name, lastname: userName.lastname }),
         status,
         category,
         daysConfig,
