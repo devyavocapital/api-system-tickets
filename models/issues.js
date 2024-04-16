@@ -6,7 +6,7 @@ import { formatName } from '../utils/formatName.js'
 import { getEmailTest } from './email.js'
 
 export class IssuesModel {
-  static async getIssues ({ id = 'null', nameClient = 'null' }) {
+  static async getIssues ({ id = 'null', task = 'null' }) {
     try {
       await mongoose.connect(urlApi)
 
@@ -16,12 +16,12 @@ export class IssuesModel {
         return issuesList
       }
 
-      if (id === 'null' && nameClient !== 'null') {
+      if (id === 'null' && task !== 'null') {
         const issuesList = await issue
           .find({
-            taks: { $regex: nameClient }
+            task: { $regex: task.toLowerCase() }
           })
-          .sort({ created_At: -1, status: 1, nameClient: 1 })
+          .sort({ created_At: -1, status: 1, task: 1 })
 
         return issuesList
       }
@@ -112,10 +112,21 @@ export class IssuesModel {
     nameAssignated,
     status = 'pendient',
     category = 0,
-    daysConfig
+    daysConfig,
+    userId
   }) {
     try {
       await mongoose.connect(urlApi)
+
+      let userName = {
+        name: '',
+        lastname: ''
+      }
+
+      if (assignTo === undefined) {
+        const userNameResponse = await user.findById({ _id: userId }).select(['name', 'lastname'])
+        userName = { name: userNameResponse.name, lastname: userNameResponse.lastname }
+      }
 
       const issueExist = await issue.findById(id)
       if (!issueExist) {
@@ -133,8 +144,8 @@ export class IssuesModel {
         creditNumber,
         socialNumber,
         cardNumber,
-        assignTo,
-        nameAssignated,
+        assignTo: assignTo !== undefined ? assignTo : userId,
+        nameAssignated: assignTo !== undefined ? nameAssignated : formatName({ name: userName.name, lastname: userName.lastname }),
         status,
         category: parseInt(category),
         daysConfig: parseInt(daysConfig)

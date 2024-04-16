@@ -51,9 +51,9 @@ export const createIssue = async (req, res) => {
 }
 
 export const getIssues = async (req, res) => {
-  const { id, nameClient } = req.query
+  const { id, task } = req.query
   try {
-    const response = await IssuesModel.getIssues({ id, nameClient })
+    const response = await IssuesModel.getIssues({ id, task })
     res.json(response)
   } catch (error) {
     console.log(error)
@@ -101,6 +101,7 @@ export const updateIssue = async (req, res) => {
   } = req.body
 
   const { id } = req.query
+  const userId = req.usuario.id
 
   try {
     const response = await IssuesModel.updateIssue({
@@ -116,7 +117,8 @@ export const updateIssue = async (req, res) => {
       nameAssignated,
       status,
       category,
-      daysConfig
+      daysConfig,
+      userId
     })
 
     if (response?.error) {
