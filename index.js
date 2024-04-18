@@ -76,7 +76,7 @@ app.use('/', (req, res) => {
 //  # │ │ │ │ │ │
 //  # * * * * * *
 
-cron.schedule('29 12 * * *', () => {
+cron.schedule('00 9 * * *', () => {
   console.log('test')
   getEmailRemainder()
 }, {
