@@ -3,7 +3,7 @@ import { urlApi } from '../db/config.js'
 import issue from '../schemas/issue.js'
 import user from '../schemas/user.js'
 import { formatName } from '../utils/formatName.js'
-import { getEmailTest } from './email.js'
+import { sendEmail } from './email.js'
 
 export class IssuesModel {
   static async getIssues ({ id = 'null', task = 'null' }) {
@@ -77,11 +77,12 @@ export class IssuesModel {
 
       if (assignTo !== null || assignTo !== undefined) {
         const userAssignated = await user.findById({ _id: assignTo })
-        getEmailTest({
+        sendEmail({
           toEmail: userAssignated.email,
           subject: `Ticket Asignado - ${task}`,
           task,
-          daysConfig
+          daysConfig,
+          layout: true
         })
       }
 
@@ -145,11 +146,12 @@ export class IssuesModel {
 
       if (assignTo !== null || assignTo !== undefined) {
         const userAssignated = await user.findById({ _id: assignTo })
-        getEmailTest({
+        sendEmail({
           toEmail: userAssignated.email,
           subject: `Ticket Asignado - ${task}`,
           task,
-          daysConfig
+          daysConfig,
+          layout: true
         })
       }
 
