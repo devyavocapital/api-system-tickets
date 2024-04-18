@@ -21,7 +21,6 @@ const CommentSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    required: [true, 'El status es obligatorio.'],
     trim: true
   },
   fileName: {
