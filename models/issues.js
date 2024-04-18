@@ -44,7 +44,7 @@ export class IssuesModel {
     socialNumber,
     cardNumber,
     initialComment = '',
-    assignTo = null,
+    assignTo,
     nameAssignated,
     status = 'pendient',
     category = 0,
@@ -54,15 +54,7 @@ export class IssuesModel {
     try {
       await mongoose.connect(urlApi)
 
-      let userName = {
-        name: '',
-        lastname: ''
-      }
-
-      if (assignTo === undefined) {
-        const userNameResponse = await user.findById({ _id: userId }).select(['name', 'lastname'])
-        userName = { name: userNameResponse.name, lastname: userNameResponse.lastname }
-      }
+      const userNameResponse = await user.findById({ _id: userId }).select(['name', 'lastname'])
 
       const newIssue = issue({
         task,
@@ -74,7 +66,7 @@ export class IssuesModel {
         cardNumber,
         initialComment,
         assignTo: assignTo !== undefined ? assignTo : userId,
-        nameAssignated: assignTo !== undefined ? nameAssignated : formatName({ name: userName.name, lastname: userName.lastname }),
+        nameAssignated: assignTo !== userId ? nameAssignated : formatName({ name: userNameResponse.name, lastname: userNameResponse.lastname }),
         status,
         category,
         daysConfig,
@@ -108,7 +100,7 @@ export class IssuesModel {
     creditNumber,
     socialNumber,
     cardNumber,
-    assignTo = null,
+    assignTo,
     nameAssignated,
     status = 'pendient',
     category = 0,

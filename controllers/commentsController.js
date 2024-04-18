@@ -12,9 +12,7 @@ export const getComments = async (req, res) => {
 }
 
 export const createComment = async (req, res) => {
-  const { description, idIssue, assignTo, nameAssignated, status, fileName } =
-		req.body
-
+  const { description, idIssue, assignTo, nameAssignated, status, fileName } = req.body
   const userId = req.usuario.id
 
   try {

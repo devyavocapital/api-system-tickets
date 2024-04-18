@@ -2,6 +2,8 @@ import mongoose from 'mongoose'
 import { urlApi } from '../db/config.js'
 import comments from '../schemas/comment.js'
 import issues from '../schemas/issue.js'
+import user from '../schemas/user.js'
+import { formatName } from '../utils/formatName.js'
 
 export class CommentModel {
   static async getComments ({ idIssue = null }) {
@@ -64,13 +66,21 @@ export class CommentModel {
     try {
       await mongoose.connect(urlApi)
 
+      let currentStatus
+      const userNameResponse = await user.findById({ _id: userId }).select(['name', 'lastname', 'email'])
+
+      if (assignTo === undefined || assignTo === '') {
+        const statusActual = await issues.findById({ _id: idIssue }).select(['status'])
+        currentStatus = statusActual
+      }
+
       const newComment = comments({
         description,
         userId,
         idIssue,
-        assignTo,
-        nameAssignated,
-        status,
+        assignTo: (assignTo !== '') ? assignTo : userId,
+        nameAssignated: (assignTo !== '') ? nameAssignated : formatName({ name: userNameResponse.name, lastname: userNameResponse.lastname }),
+        status: (assignTo === undefined || assignTo === '') ? currentStatus : status,
         fileName
       })
 
@@ -88,9 +98,10 @@ export class CommentModel {
         )
       }
 
-      await newComment.save()
+      const comment = await newComment.save()
+      const newCommentSaved = { _id: comment._id, created_At: comment.created_At, description: comment.description, fileName: null, user: [{ email: userNameResponse.email, lastname: userNameResponse.lastname, name: userNameResponse.name }] }
 
-      return { msg: 'Comentario creado correctamente', status: 201 }
+      return { msg: 'Comentario creado correctamente', status: 201, newCommentSaved }
     } catch (error) {
       console.log({ errorMongo: error })
       return { error }
