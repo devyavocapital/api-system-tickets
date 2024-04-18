@@ -66,16 +66,6 @@ app.use('/', (req, res) => {
   res.status(200).json({ msg: 'Estas usando la version 1' })
 })
 
-//  # ┌────────────── second (optional)
-//  # │ ┌──────────── minute
-//  # │ │ ┌────────── hour
-//  # │ │ │ ┌──────── day of month
-//  # │ │ │ │ ┌────── month
-//  # │ │ │ │ │ ┌──── day of week
-//  # │ │ │ │ │ │
-//  # │ │ │ │ │ │
-//  # * * * * * *
-
 cron.schedule('00 9 * * *', () => {
   console.log('test')
   getEmailRemainder()
