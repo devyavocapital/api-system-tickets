@@ -14,6 +14,8 @@ import { loginRouter } from './routes/login.js'
 import { namesRouter } from './routes/names.js'
 import { notificationRouter } from './routes/notifications.js'
 // import { statsRouter } from "./routes/stats.js";
+import cron from 'node-cron'
+import { getEmailRemainder } from './models/email.js'
 
 const app = express()
 const http = createServer(app)
@@ -62,6 +64,14 @@ app.use('/images', routerImages)
 // app.use("/api/v1/stats", tokenApi, statsRouter);
 app.use('/', (req, res) => {
   res.status(200).json({ msg: 'Estas usando la version 1' })
+})
+
+cron.schedule('00 9 * * *', () => {
+  console.log('test')
+  getEmailRemainder()
+}, {
+  scheduled: true,
+  timezone: 'America/Mexico_City'
 })
 
 http.listen(PORT, () => {
